@@ -5,8 +5,10 @@ const pkg = require('../package.json');
 
 const bannerPack = new webpack.BannerPlugin({
   banner: [
-    `Quill Editor v${pkg.version}`,
-    'https://quilljs.com/',
+    `DevExtreme-Quill Editor v.${pkg.version}`,
+    'https://js.devexpress.com/',
+    'Copyright (c) 2020, Developer Express Inc.',
+    'Copyright (c) 2017, Slab',
     'Copyright (c) 2014, Jason Chen',
     'Copyright (c) 2013, salesforce.com',
   ].join('\n'),
@@ -30,33 +32,26 @@ const source = [
   return path.resolve(__dirname, '..', file);
 });
 
+const babelLoader = {
+  loader: 'babel-loader',
+  options: {
+    presets: [
+      [
+        '@babel/env',
+        {
+          targets: {
+            browsers: ['last 2 versions', 'ios > 8', 'ie > 10', '> 1%'],
+          },
+        },
+      ],
+    ],
+  },
+};
+
 const jsRules = {
   test: /\.js$/,
   include: source,
-  use: [
-    {
-      loader: 'babel-loader',
-      options: {
-        presets: [
-          [
-            '@babel/env',
-            {
-              targets: {
-                browsers: [
-                  'last 2 Chrome major versions',
-                  'last 2 Firefox major versions',
-                  'last 2 Safari major versions',
-                  'last 2 Edge major versions',
-                  'last 2 iOS major versions',
-                  'last 2 ChromeAndroid major versions',
-                ],
-              },
-            },
-          ],
-        ],
-      },
-    },
-  ],
+  use: [babelLoader],
 };
 
 const svgRules = {
@@ -81,6 +76,7 @@ const stylRules = {
 const tsRules = {
   test: /\.ts$/,
   use: [
+    babelLoader,
     {
       loader: 'ts-loader',
       options: {
