@@ -415,6 +415,11 @@ function contains(parent, descendant) {
   } catch (e) {
     return false;
   }
+
+  if (descendant instanceof Text) {
+    parent.contains(descendant.parentNode);
+  }
+
   return parent.contains(descendant);
 }
 
