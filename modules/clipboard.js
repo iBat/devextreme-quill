@@ -239,42 +239,44 @@ function deltaEndsWith(delta, text) {
 
 function isLine(node) {
   if (node.childNodes.length === 0) return false; // Exclude embed blocks
-  return [
-    'address',
-    'article',
-    'blockquote',
-    'canvas',
-    'dd',
-    'div',
-    'dl',
-    'dt',
-    'fieldset',
-    'figcaption',
-    'figure',
-    'footer',
-    'form',
-    'h1',
-    'h2',
-    'h3',
-    'h4',
-    'h5',
-    'h6',
-    'header',
-    'iframe',
-    'li',
-    'main',
-    'nav',
-    'ol',
-    'output',
-    'p',
-    'pre',
-    'section',
-    'table',
-    'td',
-    'tr',
-    'ul',
-    'video',
-  ].includes(node.tagName.toLowerCase());
+  return (
+    [
+      'address',
+      'article',
+      'blockquote',
+      'canvas',
+      'dd',
+      'div',
+      'dl',
+      'dt',
+      'fieldset',
+      'figcaption',
+      'figure',
+      'footer',
+      'form',
+      'h1',
+      'h2',
+      'h3',
+      'h4',
+      'h5',
+      'h6',
+      'header',
+      'iframe',
+      'li',
+      'main',
+      'nav',
+      'ol',
+      'output',
+      'p',
+      'pre',
+      'section',
+      'table',
+      'td',
+      'tr',
+      'ul',
+      'video',
+    ].indexOf(node.tagName.toLowerCase()) !== -1
+  );
 }
 
 const preNodes = new WeakMap();
@@ -407,7 +409,7 @@ function matchIndent(node, delta, scroll) {
   let indent = -1;
   let parent = node.parentNode;
   while (parent != null) {
-    if (['OL', 'UL'].includes(parent.tagName)) {
+    if (['OL', 'UL'].indexOf(parent.tagName) !== -1) {
       indent += 1;
     }
     parent = parent.parentNode;
@@ -492,7 +494,7 @@ function matchText(node, delta) {
   if (node.parentNode.tagName === 'O:P') {
     return delta.insert(text.trim());
   }
-  if (text.trim().length === 0 && text.includes('\n')) {
+  if (text.trim().length === 0 && text.indexOf('\n') !== -1) {
     return delta;
   }
   if (!isPre(node)) {

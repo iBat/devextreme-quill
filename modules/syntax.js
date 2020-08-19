@@ -121,7 +121,9 @@ class SyntaxCodeBlockContainer extends CodeBlockContainer {
           if (attributes) {
             Object.keys(attributes).forEach(format => {
               if (
-                [SyntaxCodeBlock.blotName, CodeToken.blotName].includes(format)
+                [SyntaxCodeBlock.blotName, CodeToken.blotName].indexOf(
+                  format,
+                ) !== -1
               ) {
                 this.formatAt(index, retain, format, attributes[format]);
               }
