@@ -83,8 +83,8 @@ const tsRules = {
         compilerOptions: {
           declaration: false,
           module: 'es6',
+          target: 'es5',
           sourceMap: true,
-          target: 'es6',
         },
         transpileOnly: true,
       },

@@ -1,6 +1,4 @@
-import 'core-js/features/array/from';
-import 'core-js/features/string/starts-with';
-
+import './polyfills';
 import Quill from './core';
 
 import { AlignClass, AlignStyle } from './formats/align';
