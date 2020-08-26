@@ -242,7 +242,7 @@ function convertListHTML(items, lastIndent, types) {
     return `</li></${endTag}>${convertListHTML([], lastIndent - 1, types)}`;
   }
   const [{ child, offset, length, indent, type }, ...rest] = items;
-  const [tag, attribute] = getListType(type);
+  const [tag, attribute] = getListType(type, child);
   if (indent > lastIndent) {
     types.push(type);
     if (indent === lastIndent + 1) {
@@ -293,6 +293,9 @@ function convertHTML(blot, index, length, isRoot = false) {
     blot.children.forEachAt(index, length, (child, offset, childLength) => {
       parts.push(convertHTML(child, offset, childLength));
     });
+
+    handleBreakLine(blot.children, parts);
+
     if (isRoot || blot.statics.blotName === 'list') {
       return parts.join('');
     }
@@ -305,6 +308,12 @@ function convertHTML(blot, index, length, isRoot = false) {
     return `${start}>${parts.join('')}<${end}`;
   }
   return blot.domNode.outerHTML;
+}
+
+function handleBreakLine(linkedList, parts) {
+  if (linkedList.length === 1 && linkedList.head instanceof Break) {
+    parts.push('<br>');
+  }
 }
 
 function combineFormats(formats, combined) {
@@ -323,16 +332,45 @@ function combineFormats(formats, combined) {
   }, {});
 }
 
-function getListType(type) {
+function getListType(type, child) {
   const tag = type === 'ordered' ? 'ol' : 'ul';
+  const attributes = child ? `${getBlotNodeAttributes(child)}` : '';
   switch (type) {
     case 'checked':
-      return [tag, ' data-list="checked"'];
+      return [tag, `${attributes} data-list="checked"`];
     case 'unchecked':
-      return [tag, ' data-list="unchecked"'];
+      return [tag, `${attributes} data-list="unchecked"`];
     default:
-      return [tag, ''];
+      return [tag, attributes];
   }
+}
+
+function getBlotNodeAttributes({ domNode }) {
+  if (!domNode.hasAttributes()) {
+    return '';
+  }
+
+  const { attributes } = domNode;
+  let attributesString = ' ';
+
+  for (let i = 0; i < attributes.length; i += 1) {
+    const { name } = attributes[i];
+    let { value } = attributes[i];
+
+    if (name === 'class') {
+      value = removeIndentClass(value);
+    }
+
+    if (value.length && name.indexOf('data-') === -1) {
+      attributesString += `${name}="${value}"`;
+    }
+  }
+
+  return attributesString.length > 1 ? attributesString : '';
+}
+
+function removeIndentClass(classString) {
+  return classString.replace(/ql-indent-\d/g, '').trim();
 }
 
 function normalizeDelta(delta) {

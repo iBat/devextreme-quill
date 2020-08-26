@@ -79,6 +79,17 @@ describe('Quill', function() {
       expect(this.quill.getSelection()).toEqual(new Range(3, 2));
     });
 
+    it('should respect formatting attributes of the list item', function() {
+      const instance = this.initialize(Quill, '<ul><li>test</li></ul>');
+
+      instance.setSelection(0, 4);
+      instance.format('align', 'center');
+
+      expect(instance.root).toEqualHTML(
+        '<ol><li data-list="bullet" class="ql-align-center">test</li></ol>',
+      );
+    });
+
     it('formatLine()', function() {
       this.quill.formatLine(1, 1, 'header', 2);
       const change = new Delta().retain(8).retain(1, { header: 2 });
@@ -896,6 +907,54 @@ describe('Quill', function() {
     it('formatted line', function() {
       this.quill.formatLine(0, 1, 'list', 'ordered');
       expect(this.quill.root.classList).not.toContain('ql-blank');
+    });
+  });
+
+  describe('semantic HTML', function() {
+    it('list with more the one level of indent', function() {
+      const expected =
+        '<ul><li>item1-1<ul><li><ul><li>item3-1</li></ul></li></ul></li><li>item1-2</li></ul>';
+      const instance = this.initialize(Quill, expected);
+
+      expect(instance.getSemanticHTML()).toEqual(expected);
+    });
+
+    it('should respect list item attributes', function() {
+      const deltaOps = [
+        { insert: 'item1' },
+        {
+          attributes: {
+            align: 'center',
+            list: 'bullet',
+          },
+          insert: '\n',
+        },
+        { insert: 'item2' },
+        {
+          attributes: {
+            align: 'center',
+            indent: 1,
+            list: 'bullet',
+          },
+          insert: '\n',
+        },
+      ];
+      const expected =
+        '<ul><li class="ql-align-center">item1<ul><li class="ql-align-center">item2</li></ul></li></ul>';
+      const instance = this.initialize(Quill, '');
+
+      instance.setContents(deltaOps);
+      expect(instance.getSemanticHTML()).toEqual(expected);
+    });
+
+    it('should preserve break lines', function() {
+      const instance = this.initialize(
+        Quill,
+        '<br><br><h1>Hi!</h1><p>Te<br>st</p>',
+      );
+      const expected = '<p><br></p><p><br></p><h1>Hi!</h1><p>Te</p><p>st</p>';
+
+      expect(instance.getSemanticHTML()).toEqual(expected);
     });
   });
 });
