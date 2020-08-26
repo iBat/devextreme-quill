@@ -321,6 +321,23 @@ describe('Clipboard', function() {
       expect(delta).toEqual(new Delta().insert('Test\n', { direction: 'rtl' }));
     });
 
+    it('text decoration', function() {
+      const delta = this.clipboard.convert({
+        html: `
+        <span style="text-decoration: underline;">test1</span>
+        <span style="text-decoration: line-through;">test2</span>
+        <span style="text-decoration: underline line-through;">test3</span>
+        `,
+      });
+
+      expect(delta).toEqual(
+        new Delta()
+          .insert('test1', { underline: true })
+          .insert('test2', { strike: true })
+          .insert('test3', { strike: true, underline: true }),
+      );
+    });
+
     it('nested styles', function() {
       const delta = this.clipboard.convert({
         html:
