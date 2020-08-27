@@ -8,6 +8,63 @@ import Module from '../core/module';
 
 const debug = logger('quill:keyboard');
 
+const KEY_NAMES = {
+  backspace: 'backspace',
+  tab: 'tab',
+  enter: 'enter',
+  escape: 'escape',
+  pageup: 'pageUp',
+  pagedown: 'pageDown',
+  end: 'end',
+  home: 'home',
+  arrowleft: 'leftArrow',
+  arrowup: 'upArrow',
+  arrowright: 'rightArrow',
+  arrowdown: 'downArrow',
+  delete: 'del',
+  ' ': 'space',
+  '*': 'asterisk',
+  '-': 'minus',
+  alt: 'alt',
+  control: 'control',
+  shift: 'shift',
+  // IE11:
+  left: 'leftArrow',
+  up: 'upArrow',
+  right: 'rightArrow',
+  down: 'downArrow',
+  multiply: 'asterisk',
+  spacebar: 'space',
+  del: 'del',
+  subtract: 'minus',
+  esc: 'escape',
+};
+
+const KEY_CODES = {
+  // iOS 10.2 and lower didn't supports KeyboardEvent.key
+  '8': 'backspace',
+  '9': 'tab',
+  '13': 'enter',
+  '27': 'escape',
+  '33': 'pageUp',
+  '34': 'pageDown',
+  '35': 'end',
+  '36': 'home',
+  '37': 'leftArrow',
+  '38': 'upArrow',
+  '39': 'rightArrow',
+  '40': 'downArrow',
+  '46': 'del',
+  '32': 'space',
+  '106': 'asterisk',
+  '109': 'minus',
+  '189': 'minus',
+  '173': 'minus',
+  '16': 'shift',
+  '17': 'control',
+  '18': 'alt',
+};
+
 const SHORTKEY = /Mac/i.test(navigator.platform) ? 'metaKey' : 'ctrlKey';
 
 class Keyboard extends Module {
@@ -19,7 +76,26 @@ class Keyboard extends Module {
     ) {
       return false;
     }
-    return binding.key === evt.key || binding.key === evt.which;
+    return (
+      binding.key === Keyboard.normalizeKeyName(evt) ||
+      binding.key === evt.which
+    );
+  }
+
+  static normalizeKeyName({ key, which }) {
+    const isKeySupported = !!key;
+
+    key = isKeySupported ? key : which;
+
+    if (key) {
+      if (isKeySupported) {
+        key = KEY_NAMES[key.toLowerCase()] || key;
+      } else {
+        key = KEY_CODES[key] || String.fromCharCode(key);
+      }
+    }
+
+    return key;
   }
 
   constructor(quill, options) {
@@ -30,48 +106,44 @@ class Keyboard extends Module {
         this.addBinding(this.options.bindings[name]);
       }
     });
-    this.addBinding({ key: 'Enter', shiftKey: null }, this.handleEnter);
+    this.addBinding({ key: 'enter', shiftKey: null }, this.handleEnter);
     this.addBinding(
-      { key: 'Enter', metaKey: null, ctrlKey: null, altKey: null },
+      { key: 'enter', metaKey: null, ctrlKey: null, altKey: null },
       () => {},
     );
     if (/Firefox/i.test(navigator.userAgent)) {
       // Need to handle delete and backspace for Firefox in the general case #1171
       this.addBinding(
-        { key: 'Backspace' },
+        { key: 'backspace' },
         { collapsed: true },
         this.handleBackspace,
       );
-      this.addBinding(
-        { key: 'Delete' },
-        { collapsed: true },
-        this.handleDelete,
-      );
+      this.addBinding({ key: 'del' }, { collapsed: true }, this.handleDelete);
     } else {
       this.addBinding(
-        { key: 'Backspace' },
+        { key: 'backspace' },
         { collapsed: true, prefix: /^.?$/ },
         this.handleBackspace,
       );
       this.addBinding(
-        { key: 'Delete' },
+        { key: 'del' },
         { collapsed: true, suffix: /^.?$/ },
         this.handleDelete,
       );
     }
     this.addBinding(
-      { key: 'Backspace' },
+      { key: 'backspace' },
       { collapsed: false },
       this.handleDeleteRange,
     );
     this.addBinding(
-      { key: 'Delete' },
+      { key: 'del' },
       { collapsed: false },
       this.handleDeleteRange,
     );
     this.addBinding(
       {
-        key: 'Backspace',
+        key: 'backspace',
         altKey: null,
         ctrlKey: null,
         metaKey: null,
@@ -111,7 +183,8 @@ class Keyboard extends Module {
   listen() {
     this.quill.root.addEventListener('keydown', evt => {
       if (evt.defaultPrevented || evt.isComposing) return;
-      const bindings = (this.bindings[evt.key] || []).concat(
+      const keyName = Keyboard.normalizeKeyName(evt);
+      const bindings = (this.bindings[keyName] || []).concat(
         this.bindings[evt.which] || [],
       );
       const matches = bindings.filter(binding => Keyboard.match(evt, binding));
@@ -296,7 +369,7 @@ Keyboard.DEFAULTS = {
     underline: makeFormatHandler('underline'),
     indent: {
       // highlight tab or tab at beginning of list, indent or blockquote
-      key: 'Tab',
+      key: 'tab',
       format: ['blockquote', 'indent', 'list'],
       handler(range, context) {
         if (context.collapsed && context.offset !== 0) return true;
@@ -305,7 +378,7 @@ Keyboard.DEFAULTS = {
       },
     },
     outdent: {
-      key: 'Tab',
+      key: 'tab',
       shiftKey: true,
       format: ['blockquote', 'indent', 'list'],
       // highlight tab or tab at beginning of list, indent or blockquote
@@ -316,7 +389,7 @@ Keyboard.DEFAULTS = {
       },
     },
     'outdent backspace': {
-      key: 'Backspace',
+      key: 'backspace',
       collapsed: true,
       shiftKey: null,
       metaKey: null,
@@ -335,7 +408,7 @@ Keyboard.DEFAULTS = {
     'indent code-block': makeCodeBlockHandler(true),
     'outdent code-block': makeCodeBlockHandler(false),
     'remove tab': {
-      key: 'Tab',
+      key: 'tab',
       shiftKey: true,
       collapsed: true,
       prefix: /\t$/,
@@ -344,7 +417,7 @@ Keyboard.DEFAULTS = {
       },
     },
     tab: {
-      key: 'Tab',
+      key: 'tab',
       handler(range, context) {
         if (context.format.table) return true;
         this.quill.history.cutoff();
@@ -359,7 +432,7 @@ Keyboard.DEFAULTS = {
       },
     },
     'blockquote empty enter': {
-      key: 'Enter',
+      key: 'enter',
       collapsed: true,
       format: ['blockquote'],
       empty: true,
@@ -368,7 +441,7 @@ Keyboard.DEFAULTS = {
       },
     },
     'list empty enter': {
-      key: 'Enter',
+      key: 'enter',
       collapsed: true,
       format: ['list'],
       empty: true,
@@ -386,7 +459,7 @@ Keyboard.DEFAULTS = {
       },
     },
     'checklist enter': {
-      key: 'Enter',
+      key: 'enter',
       collapsed: true,
       format: { list: 'checked' },
       handler(range) {
@@ -406,7 +479,7 @@ Keyboard.DEFAULTS = {
       },
     },
     'header enter': {
-      key: 'Enter',
+      key: 'enter',
       collapsed: true,
       format: ['header'],
       suffix: /^$/,
@@ -423,21 +496,21 @@ Keyboard.DEFAULTS = {
       },
     },
     'table backspace': {
-      key: 'Backspace',
+      key: 'backspace',
       format: ['table'],
       collapsed: true,
       offset: 0,
       handler() {},
     },
     'table delete': {
-      key: 'Delete',
+      key: 'del',
       format: ['table'],
       collapsed: true,
       suffix: /^$/,
       handler() {},
     },
     'table enter': {
-      key: 'Enter',
+      key: 'enter',
       shiftKey: null,
       format: ['table'],
       handler(range) {
@@ -465,7 +538,7 @@ Keyboard.DEFAULTS = {
       },
     },
     'table tab': {
-      key: 'Tab',
+      key: 'tab',
       shiftKey: null,
       format: ['table'],
       handler(range, context) {
@@ -479,7 +552,7 @@ Keyboard.DEFAULTS = {
       },
     },
     'list autofill': {
-      key: ' ',
+      key: 'space',
       shiftKey: null,
       collapsed: true,
       format: {
@@ -525,7 +598,7 @@ Keyboard.DEFAULTS = {
       },
     },
     'code exit': {
-      key: 'Enter',
+      key: 'enter',
       collapsed: true,
       format: ['code-block'],
       prefix: /^$/,
@@ -566,7 +639,7 @@ Keyboard.DEFAULTS = {
 
 function makeCodeBlockHandler(indent) {
   return {
-    key: 'Tab',
+    key: 'tab',
     shiftKey: !indent,
     format: { 'code-block': true },
     handler(range) {
@@ -600,7 +673,7 @@ function makeCodeBlockHandler(indent) {
 }
 
 function makeEmbedArrowHandler(key, shiftKey) {
-  const where = key === 'ArrowLeft' ? 'prefix' : 'suffix';
+  const where = key === 'leftArrow' ? 'prefix' : 'suffix';
   return {
     key,
     shiftKey,
@@ -608,7 +681,7 @@ function makeEmbedArrowHandler(key, shiftKey) {
     [where]: /^$/,
     handler(range) {
       let { index } = range;
-      if (key === 'ArrowRight') {
+      if (key === 'rightArrow') {
         index += range.length + 1;
       }
       const [leaf] = this.quill.getLeaf(index);
@@ -652,7 +725,7 @@ function makeFormatHandler(format) {
 
 function makeTableArrowHandler(up) {
   return {
-    key: up ? 'ArrowUp' : 'ArrowDown',
+    key: up ? 'upArrow' : 'downArrow',
     collapsed: true,
     format: ['table'],
     handler(range, context) {
