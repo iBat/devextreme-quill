@@ -5,9 +5,35 @@ import Module from '../core/module';
 class Uploader extends Module {
   constructor(quill, options) {
     super(quill, options);
-    quill.root.addEventListener('drop', e => {
+
+    this.addDragOverHandler();
+    this.addDropHandler();
+  }
+
+  addDragOverHandler() {
+    const ua = window.navigator.userAgent.toLowerCase();
+    const isMsIe =
+      ua.indexOf('msie ') !== -1 ||
+      ua.indexOf('trident/') !== -1 ||
+      ua.indexOf('edge/') !== -1;
+
+    if (isMsIe) {
+      this.quill.root.addEventListener('dragover', e => {
+        e.preventDefault();
+      });
+    }
+  }
+
+  addDropHandler() {
+    this.quill.root.addEventListener('drop', e => {
       e.preventDefault();
       let native;
+      const { onDrop } = this.options;
+
+      if (onDrop && typeof onDrop === 'function') {
+        onDrop(e);
+      }
+
       if (document.caretRangeFromPoint) {
         native = document.caretRangeFromPoint(e.clientX, e.clientY);
       } else if (document.caretPositionFromPoint) {
@@ -18,8 +44,8 @@ class Uploader extends Module {
       } else {
         return;
       }
-      const normalized = quill.selection.normalizeNative(native);
-      const range = quill.selection.normalizedToRange(normalized);
+      const normalized = this.quill.selection.normalizeNative(native);
+      const range = this.quill.selection.normalizedToRange(normalized);
       this.upload(range, e.dataTransfer.files);
     });
   }

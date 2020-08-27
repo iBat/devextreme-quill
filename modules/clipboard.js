@@ -142,7 +142,13 @@ class Clipboard extends Module {
   onCapturePaste(e) {
     if (e.defaultPrevented || !this.quill.isEnabled()) return;
     e.preventDefault();
+    const { onPaste } = this.options;
     const range = this.quill.getSelection(true);
+
+    if (onPaste && typeof onPaste === 'function') {
+      onPaste(e);
+    }
+
     if (range == null) return;
     const html = e.clipboardData.getData('text/html');
     const text = e.clipboardData.getData('text/plain');
