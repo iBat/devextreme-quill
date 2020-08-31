@@ -58,14 +58,15 @@ class Uploader extends Module {
       }
     });
     if (uploads.length > 0) {
-      this.options.handler.call(this, range, uploads);
+      this.options.handler.call(this, range, uploads, this.options.imageBlot);
     }
   }
 }
 
 Uploader.DEFAULTS = {
   mimetypes: ['image/png', 'image/jpeg'],
-  handler(range, files) {
+  imageBlot: 'image',
+  handler(range, files, blotName) {
     const promises = files.map(file => {
       return new Promise(resolve => {
         const reader = new FileReader();
@@ -77,7 +78,7 @@ Uploader.DEFAULTS = {
     });
     Promise.all(promises).then(images => {
       const update = images.reduce((delta, image) => {
-        return delta.insert({ image });
+        return delta.insert({ [blotName]: image });
       }, new Delta().retain(range.index).delete(range.length));
       this.quill.updateContents(update, Emitter.sources.USER);
       this.quill.setSelection(

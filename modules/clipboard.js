@@ -128,26 +128,34 @@ class Clipboard extends Module {
 
   onCaptureCopy(e, isCut = false) {
     if (e.defaultPrevented) return;
-    e.preventDefault();
+    if (e.clipboardData) {
+      e.preventDefault();
+    } else {
+      return;
+    }
     const [range] = this.quill.selection.getRange();
     if (range == null) return;
     const { html, text } = this.onCopy(range, isCut);
     e.clipboardData.setData('text/plain', text);
     e.clipboardData.setData('text/html', html);
     if (isCut) {
+      this.raiseCallback('onCut', e);
       this.quill.deleteText(range, Quill.sources.USER);
     }
   }
 
   onCapturePaste(e) {
     if (e.defaultPrevented || !this.quill.isEnabled()) return;
-    e.preventDefault();
-    const { onPaste } = this.options;
-    const range = this.quill.getSelection(true);
 
-    if (onPaste && typeof onPaste === 'function') {
-      onPaste(e);
+    this.raiseCallback('onPaste', e);
+
+    if (e.clipboardData) {
+      e.preventDefault();
+    } else {
+      return;
     }
+
+    const range = this.quill.getSelection(true);
 
     if (range == null) return;
     const html = e.clipboardData.getData('text/html');
@@ -157,6 +165,14 @@ class Clipboard extends Module {
       this.quill.uploader.upload(range, files);
     } else {
       this.onPaste(range, { html, text });
+    }
+  }
+
+  raiseCallback(name, event) {
+    const callback = this.options[name];
+
+    if (callback && typeof callback === 'function') {
+      callback(event);
     }
   }
 
