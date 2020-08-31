@@ -91,7 +91,9 @@ class BaseTheme extends Theme {
     Array.from(buttons).forEach(button => {
       const className = button.getAttribute('class') || '';
       className.split(/\s+/).forEach(name => {
-        if (!name.startsWith('ql-')) return;
+        if (name.indexOf('ql-') !== 0) { 
+          return;
+        }
         name = name.slice('ql-'.length);
         if (icons[name] == null) return;
         if (name === 'direction') {

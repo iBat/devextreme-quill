@@ -26,8 +26,6 @@ const source = [
   'formats',
   'modules',
   'test',
-  'themes',
-  'ui',
 ].map(file => {
   return path.resolve(__dirname, '..', file);
 });
@@ -52,19 +50,6 @@ const jsRules = {
   test: /\.js$/,
   include: source,
   use: [babelLoader],
-};
-
-const svgRules = {
-  test: /\.svg$/,
-  include: [path.resolve(__dirname, '../assets/icons')],
-  use: [
-    {
-      loader: 'html-loader',
-      options: {
-        minimize: true,
-      },
-    },
-  ],
 };
 
 const stylRules = {
@@ -120,7 +105,7 @@ const baseConfig = {
     extensions: ['.js', '.styl', '.ts'],
   },
   module: {
-    rules: [jsRules, stylRules, svgRules, tsRules],
+    rules: [jsRules, stylRules, tsRules],
     noParse: [
       /\/node_modules\/clone\/clone\.js$/,
       /\/node_modules\/eventemitter3\/index\.js$/,

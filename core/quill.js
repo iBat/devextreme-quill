@@ -51,7 +51,7 @@ class Quill {
       }
       this.imports[path] = target;
       if (
-        (path.startsWith('blots/') || path.startsWith('formats/')) &&
+        (path.indexOf('blots/') === 0 || path.indexOf('formats/') === 0) &&
         target.blotName !== 'abstract'
       ) {
         globalRegistry.register(target);

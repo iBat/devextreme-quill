@@ -657,7 +657,7 @@ function makeCodeBlockHandler(indent) {
           } else {
             length += CodeBlock.TAB.length;
           }
-        } else if (line.domNode.textContent.startsWith(CodeBlock.TAB)) {
+        } else if (line.domNode.textContent.indexOf(CodeBlock.TAB) === 0) {
           line.deleteAt(0, CodeBlock.TAB.length);
           if (i === 0) {
             index -= CodeBlock.TAB.length;

@@ -3,7 +3,7 @@ import { ClassAttributor, Scope, StyleAttributor } from 'parchment';
 class ColorAttributor extends StyleAttributor {
   value(domNode) {
     let value = super.value(domNode);
-    if (!value.startsWith('rgb(')) return value;
+    if (value.indexOf('rgb(') !== 0) return value;
     value = value.replace(/^[^\d]+/, '').replace(/[^\d]+$/, '');
     const hex = value
       .split(',')

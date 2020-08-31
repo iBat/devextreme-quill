@@ -30,10 +30,6 @@ import './unit/modules/history';
 import './unit/modules/keyboard';
 import './unit/modules/syntax';
 import './unit/modules/table';
-import './unit/modules/toolbar';
-
-import './unit/ui/picker';
-import './unit/theme/base/tooltip';
 
 // Syntax version will otherwise be registered
 Quill.register(CodeBlockContainer, true);
