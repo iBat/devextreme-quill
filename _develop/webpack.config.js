@@ -90,7 +90,7 @@ const baseConfig = {
   },
   output: {
     filename: '[name]',
-    library: 'Quill',
+    library: ['DevExpress', 'Quill'],
     libraryExport: 'default',
     libraryTarget: 'umd',
     path: path.resolve(__dirname, '../dist/'),
