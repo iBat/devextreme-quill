@@ -89,7 +89,7 @@ const baseConfig = {
     'unit.js': './test/unit.js',
   },
   output: {
-    filename: '[name]',
+    filename: 'dx-[name]',
     library: ['DevExpress', 'Quill'],
     libraryExport: 'default',
     libraryTarget: 'umd',
@@ -116,7 +116,7 @@ const baseConfig = {
     bannerPack,
     constantPack,
     new MiniCssExtractPlugin({
-      filename: '[name].css',
+      filename: 'dx-[name].css',
     }),
   ],
   devServer: {
