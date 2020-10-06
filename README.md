@@ -3,6 +3,7 @@
 </h1>
 
 Devextreme-Quill is a fork of [Quill](https://quilljs.com/), based on the 2.0 branch.
+
 Comparing to the current stable version of Quill, Devextreme-Quill provides basic table support and improve working with lists.
 
 ## API
