@@ -8,25 +8,25 @@ Comparing to the current stable version of Quill, Devextreme-Quill provides basi
 
 ## API
 
-- [Content](/docs/docs/api/contents.md)
-- [Selection](/docs/docs/api/selection.md)
-- [Formatting](/docs/docs/api/formatting.md)
-- [Editor](/docs/docs/api/editor.md)
-- [Events](/docs/docs/api/events.md)
-- [Model](/docs/docs/api/model.md)
-- [Extension](/docs/docs/api/extension.md)
+- [Content](/docs/api/contents.md)
+- [Selection](/docs/api/selection.md)
+- [Formatting](/docs/api/formatting.md)
+- [Editor](/docs/api/editor.md)
+- [Events](/docs/api/events.md)
+- [Model](/docs/api/model.md)
+- [Extension](/docs/api/extension.md)
 
 ## Formats
 
-[Built-in formats](/docs/docs/formats.md)
+[Built-in formats](/docs/formats.md)
 
 ## Modules
 
-[Modules](/docs/docs/modules.md) allow Quill's behavior and functionality to be customized. Several officially supported modules are available to pick and choose from, some with additional configuration options and APIs. Refer to their respective documentation pages for more details:
-- [Clipboard](/docs/docs/modules/clipboard.md)
+[Modules](/docs/modules.md) allow Quill's behavior and functionality to be customized. Several officially supported modules are available to pick and choose from, some with additional configuration options and APIs. Refer to their respective documentation pages for more details:
+- [Clipboard](/docs/modules/clipboard.md)
 - [History](docs/docs/modules/history.md)
-- [Keyboard](/docs/docs/modules/keyboard.md)
-- [Syntax](/docs/docs/modules/syntax.md)
+- [Keyboard](/docs/modules/keyboard.md)
+- [Syntax](/docs/modules/syntax.md)
 
 ## Guides
 

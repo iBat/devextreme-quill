@@ -1,17 +1,8 @@
----
-layout: docs
-title: Designing the Delta Format
-permalink: /guides/designing-the-delta-format/
-redirect_from:
-  - /docs/api/deltas/
-  - /guides/working-with-deltas/
----
-
 Rich text editors lack a specification to express its own contents. Until recently, most rich text editors did not even know what was in their own edit areas. These editors just pass the user HTML, along with the burden of parsing and interpretting this. At any given time, this interpretation will differ from those of major browser vendors, leading to different editing experiences for users.
 
 Quill is the first rich text editor to actually understand its own contents. Key to this is Deltas, the specification describing rich text. Deltas are designed to be easy to understand and use. We will walk through some of the thinking behind Deltas, to shed light on *why* things are the way they are.
 
-If you are looking for a reference on *what* Deltas are, the [Delta documentation](/docs/delta/) is a more concise resource.
+If you are looking for a reference on *what* Deltas are, the [Delta documentation](../delta.md) is a more concise resource.
 
 
 ## Plain Text
@@ -159,7 +150,7 @@ We want to add embedded content like images or video. Strings were natural to us
 ```javascript
 var img = {
   image: {
-    url: 'https://quilljs.com/logo.png'
+    url: 'https://js.devexpress.com/Demos/WidgetsGallery/JSDemos/images/widgets/HtmlEditor.svg'
   }
 };
 
@@ -178,7 +169,7 @@ var content = [{
   attributes: { bold: true }
 }, {
   insert: {
-    image: 'https://exclamation.com/mark.png'
+    image: 'https://js.devexpress.com/Demos/WidgetsGallery/JSDemos/images/widgets/HtmlEditor.svg'
   },
   attributes: { width: '100' }
 }];
@@ -340,4 +331,4 @@ var delta = {
 };
 ```
 
-Finally, we arrive at the [Delta format](/docs/delta/), as it exists today.
+Finally, we arrive at the [Delta format](../delta.md), as it exists today.

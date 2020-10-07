@@ -1,12 +1,6 @@
----
-layout: docs
-title: Building a Custom Module
-permalink: /guides/building-a-custom-module/
----
-
 Quill's core strength as an editor is its rich API and powerful customization capabilities. As you implement functionality on top of Quill's API, it may be convenient to organize this as a module. For the purpose of this guide, we will walk through one way to build a word counter module, a commonly found feature in many word processors.
 
-*Note: Internally modules are how much of Quill's functionality is organized. You can overwrite these default [modules](/docs/modules/) by implementing your own and registering it with the same name.*
+*Note: Internally modules are how much of Quill's functionality is organized. You can overwrite these default [modules](../modules.md) by implementing your own and registering it with the same name.*
 
 ### Counting Words
 
@@ -21,7 +15,7 @@ Let's jump straight in with a complete example!
 <!-- more -->
 <div data-height="379" data-theme-id="23269" data-slug-hash="bZkWKA" data-default-tab="js" data-embed-version="2" class="codepen"><pre><code>
 // Implement and register module
-Quill.register('modules/counter', function(quill, options) {
+DevExpress.Quill.register('modules/counter', function(quill, options) {
   var container = document.querySelector('#counter');
   quill.on('text-change', function() {
     var text = quill.getText();
@@ -32,21 +26,21 @@ Quill.register('modules/counter', function(quill, options) {
 });
 
 // We can now initialize Quill with something like this:
-var quill = new Quill('#editor', {
+var quill = new DevExpress.Quill('#editor', {
   modules: {
     counter: true
   }
 });
 </code></pre></div>
 
-That's all it takes to add a custom module to Quill! A function can be [registered](/docs/api/#quillregistermodule/) as a module and it will be passed the corresponding Quill editor object along with any options.
+That's all it takes to add a custom module to Quill! A function can be [registered](../api/extension.md) as a module and it will be passed the corresponding Quill editor object along with any options.
 
 ### Using Options
 
 Modules are passed an options object that can be used to fine tune the desired behavior. We can use this to accept a selector for the counter container instead of a hard-coded string. Let's also customize the counter to either count words or characters:
 
 <div data-height="430" data-theme-id="23269" data-slug-hash="OXqmEp" data-default-tab="js" data-embed-version="2" class="codepen"><pre><code>
-Quill.register('modules/counter', function(quill, options) {
+DevExpress.Quill.register('modules/counter', function(quill, options) {
   var container = document.querySelector(options.container);
   quill.on('text-change', function() {
     var text = quill.getText();
@@ -58,7 +52,7 @@ Quill.register('modules/counter', function(quill, options) {
   });
 });
 
-var quill = new Quill('#editor', {
+var quill = new DevExpress.Quill('#editor', {
   modules: {
     counter: {
       container: '#counter',
@@ -93,7 +87,7 @@ Counter.prototype.calculate = function() {
   }
 };
 
-Quill.register('modules/counter', Counter);
+DevExpress.Quill.register('modules/counter', Counter);
 
 var quill = new Quill('#editor', {
   modules: {
@@ -145,7 +139,7 @@ class Counter {
   }
 }
 
-Quill.register('modules/counter', Counter);
+DevExpress.Quill.register('modules/counter', Counter);
 
 var quill = new Quill('#editor', {
   modules: {
@@ -156,7 +150,3 @@ var quill = new Quill('#editor', {
   }
 });
 </code></pre></div>
-
-<!-- script -->
-<script src="//codepen.io/assets/embed/ei.js"></script>
-<!-- script -->
