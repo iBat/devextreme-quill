@@ -184,7 +184,7 @@ var bindings = {
       if (context.offset === 0) {
         // When backspace on the first character of a list,
         // remove the list instead
-        this.quill.format('list', false, Quill.sources.USER);
+        this.quill.format('list', false, DevExpress.Quill.sources.USER);
       } else {
         // Otherwise propogate to Quill's default
         return true;

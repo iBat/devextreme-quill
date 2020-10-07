@@ -2,7 +2,7 @@
 
 ### deleteText
 
-Deletes text from the editor, returning a [Delta](../guides/working-with-deltas.md) representing the change. [Source](events.md) may be `"user"`, `"api"`, or `"silent"`. Calls where the `source` is `"user"` when the editor is [disabled](#disable) are ignored.
+Deletes text from the editor, returning a [Delta](../guides/designing-the-delta-format.md) representing the change. [Source](events.md) may be `"user"`, `"api"`, or `"silent"`. Calls where the `source` is `"user"` when the editor is [disabled](#disable) are ignored.
 
 **Methods**
 
@@ -68,7 +68,7 @@ var text = quill.getText(0, 10);
 
 ### insertEmbed
 
-Insert embedded content into the editor, returning a [Delta](../guides/working-with-deltas.md) representing the change. [Source](events.md) may be `"user"`, `"api"`, or `"silent"`. Calls where the `source` is `"user"` when the editor is [disabled](#disable) are ignored.
+Insert embedded content into the editor, returning a [Delta](../guides/designing-the-delta-format.md) representing the change. [Source](events.md) may be `"user"`, `"api"`, or `"silent"`. Calls where the `source` is `"user"` when the editor is [disabled](#disable) are ignored.
 
 **Methods**
 
@@ -84,7 +84,7 @@ quill.insertEmbed(10, 'image', 'https://js.devexpress.com/Demos/WidgetsGallery/J
 
 ### insertText
 
-Inserts text into the editor, optionally with a specified format or multiple [formats](../formats.md). Returns a [Delta](../guides/working-with-deltas.md) representing the change. [Source](events.md) may be `"user"`, `"api"`, or `"silent"`. Calls where the `source` is `"user"` when the editor is [disabled](#disable) are ignored.
+Inserts text into the editor, optionally with a specified format or multiple [formats](../formats.md). Returns a [Delta](../guides/designing-the-delta-format.md) representing the change. [Source](events.md) may be `"user"`, `"api"`, or `"silent"`. Calls where the `source` is `"user"` when the editor is [disabled](#disable) are ignored.
 
 **Methods**
 
@@ -129,7 +129,7 @@ quill.setContents([
 
 ### setText
 
-Sets contents of editor with given text, returning a [Delta](../guides/working-with-deltas.md) representing the change. Note Quill documents must end with a newline so one will be added for you if omitted.  [Source](events.md) may be `"user"`, `"api"`, or `"silent"`. Calls where the `source` is `"user"` when the editor is [disabled](#disable) are ignored.
+Sets contents of editor with given text, returning a [Delta](../guides/designing-the-delta-format.md) representing the change. Note Quill documents must end with a newline so one will be added for you if omitted.  [Source](events.md) may be `"user"`, `"api"`, or `"silent"`. Calls where the `source` is `"user"` when the editor is [disabled](#disable) are ignored.
 
 **Methods**
 
@@ -145,7 +145,7 @@ quill.setText('Hello\n');
 
 ### updateContents
 
-Applies Delta to editor contents, returning a [Delta](../guides/working-with-deltas.md) representing the change. These Deltas will be the same if the Delta passed in had no invalid operations. [Source](events.md) may be `"user"`, `"api"`, or `"silent"`. Calls where the `source` is `"user"` when the editor is [disabled](#disable) are ignored.
+Applies Delta to editor contents, returning a [Delta](../guides/designing-the-delta-format.md) representing the change. These Deltas will be the same if the Delta passed in had no invalid operations. [Source](events.md) may be `"user"`, `"api"`, or `"silent"`. Calls where the `source` is `"user"` when the editor is [disabled](#disable) are ignored.
 
 **Methods**
 

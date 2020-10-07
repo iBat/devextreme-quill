@@ -19,7 +19,7 @@ console.log(DevExpress.Quill.find(container) === quill);   // Should be true
 
 quill.insertText(0, 'Hello', 'link', 'https://world.com');
 var linkNode = document.querySelector('#container a');
-var linkBlot = Quill.find(linkNode);
+var linkBlot = DevExpress.Quill.find(linkNode);
 ```
 
 ### getIndex <span class="experimental">experimental</span> {#getindex-experimental}

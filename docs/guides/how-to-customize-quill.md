@@ -1,21 +1,13 @@
----
-layout: docs
-title: How to Customize Quill
-permalink: /guides/how-to-customize-quill/
-redirect_from:
-  - /guides/customizing-and-extending/
----
-
-Quill was designed with customization and extension in mind. This is achieved by implementing a small editor core exposed by a granular, well defined [API](/docs/api/). The core is augmented by [modules](/docs/modules), using the same [APIs](/docs/api/) you have access to.
+Quill was designed with customization and extension in mind. This is achieved by implementing a small editor core exposed by a granular, well defined API. The core is augmented by [modules](../modules.md), using the same APIs you have access to.
 
 In general, common customizations are handled in [configurations](#configurations/), user interfaces by [Themes](#themes) and CSS, functionality by [modules](#modules), and editor contents by [Parchment](#content-and-formatting).
 
 
 ### Configurations
 
-Quill favors Code over Configuration&trade;, but for very common needs, especially where the equivalent code would be lengthy or complex, Quill provides [configuration](/docs/configuration/) options. This would be a good first place to look to determine if you even need to implement any custom functionality.
+Quill favors Code over Configuration&trade;, but for very common needs, especially where the equivalent code would be lengthy or complex, Quill provides [configuration](../configuration.md) options. This would be a good first place to look to determine if you even need to implement any custom functionality.
 
-Two of the most powerful options is `modules` and `theme`. You can drastically change or expand what Quill can and does do by simply adding or removing individual [modules](/docs/modules/) or using a different [theme](/docs/themes/).
+Two of the most powerful options is `modules` and `theme`. You can drastically change or expand what Quill can and does do by simply adding or removing individual [modules](../modules.md) or using a different theme.
 
 
 ### Themes
@@ -134,6 +126,6 @@ DevExpress.Quill.register(PlainListItem, true);
 var quill = new DevExpress.Quill('#editor');
 ```
 
-You can view a list of Blots and Attributors available by calling `console.log(Quill.imports);`. Direct modification of this object is not supported. Use [`Quill.register`](../api/extension.md) instead.
+You can view a list of Blots and Attributors available by calling `console.log(DevExpress.Quill.imports);`. Direct modification of this object is not supported. Use [`DevExpress.Quill.register`](../api/extension.md) instead.
 
 A complete reference on Parchment, Blots and Attributors can be found on Parchment's own [README](https://github.com/quilljs/parchment/). For an in-depth walkthrough, take a look at [Cloning Medium with Parchment](cloning-medium-with-parchment.md), which starts with Quill understanding just plain text, to adding all of the formats [Medium](https://medium.com/) supports. Most of the time, you will not have to build formats from scratch since most are already implemented in Quill, but it is still useful to understanding how Quill works at this deeper level.
