@@ -55,7 +55,7 @@ quill.formatText(0, 4, 'italic', true);
 // quill.formatText(0, 4, 'myitalic', true);
 ```
 
-Let's get rid of our dummy button handler and hook up the bold and italic buttons to Quill's [`format()`](../api/formatting.md). We will hardcode `true` to always add formatting for simplicity. In your application, you can use [`getFormat()`](../api/formatting.md) to retrieve the current formatting over a arbitrary range to decide whether to add or remove a format.
+Let's get rid of our dummy button handler and hook up the bold and italic buttons to Quill's [`format()`](../api/formatting.md#format). We will hardcode `true` to always add formatting for simplicity. In your application, you can use [`getFormat()`](../api/formatting.md#getFormat) to retrieve the current formatting over a arbitrary range to decide whether to add or remove a format.
 
 Open your developer console and try out Quill's APIs on your new bold and italic formats! Make sure to set the context to the correct CodePen iframe to be able to access the `quill` variable in the demo.
 
@@ -138,7 +138,7 @@ DividerBlot.blotName = 'divider';
 DividerBlot.tagName = 'hr';
 ```
 
-Our click handler calls [`insertEmbed()`](..api/contents.md), which does not as convienently determine, save, and restore the user selection for us like [`format()`](../api/formatting.md) does, so we have to do a little more work to preserve selection ourselves. In addition, when we try to insert a BlockEmbed in the middle of the Block, Quill splits the Block for us. To make this behavior more clear, we will explicitly split the block oursevles by inserting a newline before inserting the divider. Take a look at the Babel tab in the CodePen for specifics.
+Our click handler calls [`insertEmbed()`](..api/contents.md#insertEmbed), which does not as convienently determine, save, and restore the user selection for us like [`format()`](../api/formatting.md#format) does, so we have to do a little more work to preserve selection ourselves. In addition, when we try to insert a BlockEmbed in the middle of the Block, Quill splits the Block for us. To make this behavior more clear, we will explicitly split the block oursevles by inserting a newline before inserting the divider. Take a look at the Babel tab in the CodePen for specifics.
 
 
 ### Images
@@ -219,7 +219,7 @@ VideoBlot.blotName = 'video';
 VideoBlot.tagName = 'iframe';
 ```
 
-Note if you open your console and call [`getContents`](../api/contents.md), Quill will report the video as:
+Note if you open your console and call [`getContents`](../api/contents.md#getContents), Quill will report the video as:
 
 ```js
 {

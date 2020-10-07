@@ -42,4 +42,4 @@ DevExpress.Quill.register('modules/clipboard', PlainClipboard, true);
 var quill = new DevExpress.Quill('#editor');
 ```
 
-*Note: This particular example was selected to show what is possible. It is often easier to just use an API or configuration the existing module exposes. In this example, the existing Clipboard's [addMatcher](/modules/clipboard.md) API is suitable for most paste customization scenarios.*
+*Note: This particular example was selected to show what is possible. It is often easier to just use an API or configuration the existing module exposes. In this example, the existing Clipboard's [addMatcher](/modules/clipboard.md#addMatcher) API is suitable for most paste customization scenarios.*

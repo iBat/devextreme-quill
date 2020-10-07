@@ -33,7 +33,7 @@ var quill = new DevExpress.Quill('#editor', {
 });
 </code></pre></div>
 
-That's all it takes to add a custom module to Quill! A function can be [registered](../api/extension.md) as a module and it will be passed the corresponding Quill editor object along with any options.
+That's all it takes to add a custom module to Quill! A function can be [registered](../api/extension.md#register) as a module and it will be passed the corresponding Quill editor object along with any options.
 
 ### Using Options
 

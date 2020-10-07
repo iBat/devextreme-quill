@@ -126,6 +126,6 @@ DevExpress.Quill.register(PlainListItem, true);
 var quill = new DevExpress.Quill('#editor');
 ```
 
-You can view a list of Blots and Attributors available by calling `console.log(DevExpress.Quill.imports);`. Direct modification of this object is not supported. Use [`DevExpress.Quill.register`](../api/extension.md) instead.
+You can view a list of Blots and Attributors available by calling `console.log(DevExpress.Quill.imports);`. Direct modification of this object is not supported. Use [`DevExpress.Quill.register`](../api/extension.md#register) instead.
 
 A complete reference on Parchment, Blots and Attributors can be found on Parchment's own [README](https://github.com/quilljs/parchment/). For an in-depth walkthrough, take a look at [Cloning Medium with Parchment](cloning-medium-with-parchment.md), which starts with Quill understanding just plain text, to adding all of the formats [Medium](https://medium.com/) supports. Most of the time, you will not have to build formats from scratch since most are already implemented in Quill, but it is still useful to understanding how Quill works at this deeper level.

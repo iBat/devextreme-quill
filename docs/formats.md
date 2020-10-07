@@ -1,6 +1,6 @@
 Quill supports a number of formats, both in UI controls and API calls.
 
-By default all formats are enabled and allowed to exist within a Quill editor and can be configured with the [formats](./configuration.md) option. This is separate from adding a control in the [Toolbar](https://js.devexpress.com/Documentation/ApiReference/UI_Widgets/dxHtmlEditor/Configuration/toolbar/). For example, you can configure Quill to allow bolded content to be pasted into an editor that has no bold button in the toolbar.
+By default all formats are enabled and allowed to exist within a Quill editor and can be configured with the [formats](./configuration.md#formats) option. This is separate from adding a control in the [Toolbar](https://js.devexpress.com/Documentation/ApiReference/UI_Widgets/dxHtmlEditor/Configuration/toolbar/). For example, you can configure Quill to allow bolded content to be pasted into an editor that has no bold button in the toolbar.
 
 #### Inline
 

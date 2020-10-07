@@ -66,7 +66,7 @@ Many line formats are exclusive. For example Quill does not allow a line to simu
 
 ## Changes
 
-When you register a listener for Quill's [`text-change`](/api/events.md) event, one of the arguments you will get is a Delta describing what changed. In addition to `insert` operations, this Delta might also have `delete` or `retain` operations.
+When you register a listener for Quill's [`text-change`](/api/events.md#text-change) event, one of the arguments you will get is a Delta describing what changed. In addition to `insert` operations, this Delta might also have `delete` or `retain` operations.
 
 ### Delete
 
