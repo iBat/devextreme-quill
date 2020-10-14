@@ -27,6 +27,7 @@ Comparing to the current stable version of Quill, Devextreme-Quill provides basi
 - [History](docs/docs/modules/history.md)
 - [Keyboard](/docs/modules/keyboard.md)
 - [Syntax](/docs/modules/syntax.md)
+- [Table](/docs/modules/table.md)
 
 ## Guides
 
