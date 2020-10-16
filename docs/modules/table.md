@@ -14,7 +14,7 @@ var quill = new DevExpress.Quill('#editor', {
 
 #### insertTable
 
-Adds a table into a current selection range
+Adds a table to the selection range.
 
 **Methods**
 
@@ -31,7 +31,7 @@ quill.table.insertTable(2, 2);
 
 #### insertRow
 
-Adds a row from above or below the current position. The position of the added row depends on the `offset` parameter value.
+Adds a row above or below the cursor's position. The position of the row depends on the `offset` parameter value.
 
 **Methods**
 
@@ -42,16 +42,16 @@ insertRow(offset: number)
 **Examples**
 
 ```js
-quill.table.insertRow(1); // insert row below
-quill.table.insertRow(0); // insert row above
-quill.table.insertRow(-3); // insert a row three rows above the current position
-quill.table.insertRow(3); // insert a row three rows below the current position
+quill.table.insertRow(1); // inserts a row below
+quill.table.insertRow(0); // inserts a row above
+quill.table.insertRow(-3); // inserts a row 3 rows above the current position
+quill.table.insertRow(3); // inserts a row 2 rows below the current position
 ```
 
 
 #### insertRowAbove
 
-Adds a row from above the current position.
+Adds a row above the cursor's position.
 
 **Methods**
 
@@ -68,7 +68,7 @@ quill.table.insertRowAbove();
 
 #### insertRowBelow
 
-Adds a row from below the current position.
+Adds a row below the cursor's position.
 
 **Methods**
 
@@ -84,15 +84,15 @@ quill.table.insertRowBelow();
 
 #### insertColumn
 
-Adds a column to the left or right of the current position. The position of the added column depends on the `offset` parameter value.
+Adds a column to the left or right of the cursor's position. The position of the column depends on the `offset` parameter value.
 
 **Methods**
 
 ```js
-quill.table.insertColumn(1); // insert row to the right
-quill.table.insertColumn(0); // insert row to the left
-quill.table.insertColumn(-3); // insert a column by 3 columns to the left
-quill.table.insertColumn(3); // insert a column by 3 columns to the right
+quill.table.insertColumn(1); // inserts a column to the right
+quill.table.insertColumn(0); // inserts a column to the left
+quill.table.insertColumn(-3); // inserts a column 3 columns before the current position
+quill.table.insertColumn(3); // inserts a column 2 columns after the current position
 ```
 
 **Examples**
@@ -104,7 +104,7 @@ quill.table.insertColumn();
 
 #### insertColumnLeft
 
-Adds a column to the left of the current position.
+Adds a column to the left of the cursor's position.
 
 **Methods**
 
@@ -121,7 +121,7 @@ quill.table.insertColumnLeft();
 
 #### insertColumnRight
 
-Adds a column to the right of the current position.
+Adds a column to the right of the cursor's position.
 
 **Methods**
 
@@ -138,7 +138,7 @@ quill.table.insertColumnRight();
 
 #### getTable
 
-Get the table at the specified range.
+Gets the specified range of the table.
 
 **Methods**
 
@@ -156,7 +156,7 @@ const tableBySpecificRange = quill.table.getTable({ index: 3, length: 0 });
 
 #### deleteRow
 
-Delete the row at the current selection range.
+Deletes the row at the selection range.
 
 **Methods**
 
@@ -174,7 +174,7 @@ quill.table.deleteRow();
 
 #### deleteColumn
 
-Delete the column at the current selection range.
+Deletes the column at the selection range.
 
 **Methods**
 
@@ -192,7 +192,7 @@ quill.table.deleteColumn();
 
 #### deleteTable
 
-Delete the table at the current selection range.
+Deletes the table at the selection range.
 
 **Methods**
 
