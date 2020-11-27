@@ -25,6 +25,7 @@ const source = [
   'core',
   'formats',
   'modules',
+  'utils',
   'test',
 ].map(file => {
   return path.resolve(__dirname, '..', file);
@@ -93,6 +94,7 @@ const baseConfig = {
     library: ['DevExpress', 'Quill'],
     libraryExport: 'default',
     libraryTarget: 'umd',
+    globalObject: 'this',
     path: path.resolve(__dirname, '../dist/'),
   },
   resolve: {

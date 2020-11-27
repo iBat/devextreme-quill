@@ -22,14 +22,17 @@ import { SizeStyle } from '../formats/size';
 
 const debug = logger('quill:clipboard');
 
+const ELEMENT_NODE = 1;
+const TEXT_NODE = 3;
+
 const CLIPBOARD_CONFIG = [
-  [Node.TEXT_NODE, matchText],
-  [Node.TEXT_NODE, matchNewline],
+  [TEXT_NODE, matchText],
+  [TEXT_NODE, matchNewline],
   ['br', matchBreak],
-  [Node.ELEMENT_NODE, matchNewline],
-  [Node.ELEMENT_NODE, matchBlot],
-  [Node.ELEMENT_NODE, matchAttributor],
-  [Node.ELEMENT_NODE, matchStyles],
+  [ELEMENT_NODE, matchNewline],
+  [ELEMENT_NODE, matchBlot],
+  [ELEMENT_NODE, matchAttributor],
+  [ELEMENT_NODE, matchStyles],
   ['li', matchIndent],
   ['ol, ul', matchList],
   ['pre', matchCodeBlock],
@@ -205,10 +208,10 @@ class Clipboard extends Module {
     this.matchers.forEach(pair => {
       const [selector, matcher] = pair;
       switch (selector) {
-        case Node.TEXT_NODE:
+        case TEXT_NODE:
           textMatchers.push(matcher);
           break;
-        case Node.ELEMENT_NODE:
+        case ELEMENT_NODE:
           elementMatchers.push(matcher);
           break;
         default:

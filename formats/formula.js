@@ -1,13 +1,18 @@
 import Embed from '../blots/embed';
+import hasWindow from '../utils/hasWindow';
 
 class Formula extends Embed {
   static create(value) {
-    if (window.katex == null) {
+    let katex = null;
+    if (hasWindow()) {
+      katex = window.katex;
+    }
+    if (katex == null) {
       throw new Error('Formula module requires KaTeX.');
     }
     const node = super.create(value);
     if (typeof value === 'string') {
-      window.katex.render(value, node, {
+      katex.render(value, node, {
         throwOnError: false,
         errorColor: '#f00',
       });

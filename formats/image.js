@@ -1,4 +1,5 @@
 import { EmbedBlot } from 'parchment';
+import hasWindow from '../utils/hasWindow';
 import { sanitize } from './link';
 
 const ATTRIBUTES = ['alt', 'height', 'width'];
@@ -26,7 +27,7 @@ class Image extends EmbedBlot {
   }
 
   static register() {
-    if (/Firefox/i.test(navigator.userAgent)) {
+    if (hasWindow() && /Firefox/i.test(navigator.userAgent)) {
       setTimeout(() => {
         // Disable image resizing in Firefox
         document.execCommand('enableObjectResizing', false, false);

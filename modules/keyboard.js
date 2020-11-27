@@ -5,6 +5,7 @@ import { EmbedBlot, Scope, TextBlot } from 'parchment';
 import Quill from '../core/quill';
 import logger from '../core/logger';
 import Module from '../core/module';
+import hasWindow from '../utils/hasWindow';
 
 const debug = logger('quill:keyboard');
 
@@ -65,7 +66,8 @@ const KEY_CODES = {
   '18': 'alt',
 };
 
-const SHORTKEY = /Mac/i.test(navigator.platform) ? 'metaKey' : 'ctrlKey';
+const SHORTKEY =
+  hasWindow() && /Mac/i.test(navigator.platform) ? 'metaKey' : 'ctrlKey';
 
 class Keyboard extends Module {
   static match(evt, binding) {
@@ -111,7 +113,7 @@ class Keyboard extends Module {
       { key: 'enter', metaKey: null, ctrlKey: null, altKey: null },
       () => {},
     );
-    if (/Firefox/i.test(navigator.userAgent)) {
+    if (hasWindow() && /Firefox/i.test(navigator.userAgent)) {
       // Need to handle delete and backspace for Firefox in the general case #1171
       this.addBinding(
         { key: 'backspace' },

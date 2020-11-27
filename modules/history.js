@@ -1,6 +1,7 @@
 import { Scope } from 'parchment';
 import Quill from '../core/quill';
 import Module from '../core/module';
+import hasWindow from '../utils/hasWindow';
 
 class History extends Module {
   constructor(quill, options) {
@@ -27,7 +28,7 @@ class History extends Module {
       { key: 'z', shortKey: true, shiftKey: true },
       this.redo.bind(this),
     );
-    if (/Win/i.test(navigator.platform)) {
+    if (hasWindow() && /Win/i.test(navigator.platform)) {
       this.quill.keyboard.addBinding(
         { key: 'y', shortKey: true },
         this.redo.bind(this),

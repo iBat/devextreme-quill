@@ -1,6 +1,7 @@
 import Delta from 'quill-delta';
 import Emitter from '../core/emitter';
 import Module from '../core/module';
+import hasWindow from '../utils/hasWindow';
 
 class Uploader extends Module {
   constructor(quill, options) {
@@ -11,16 +12,18 @@ class Uploader extends Module {
   }
 
   addDragOverHandler() {
-    const ua = window.navigator.userAgent.toLowerCase();
-    const isMsIe =
-      ua.indexOf('msie ') !== -1 ||
-      ua.indexOf('trident/') !== -1 ||
-      ua.indexOf('edge/') !== -1;
+    if (hasWindow()) {
+      const ua = window.navigator.userAgent.toLowerCase();
+      const isMsIe =
+        ua.indexOf('msie ') !== -1 ||
+        ua.indexOf('trident/') !== -1 ||
+        ua.indexOf('edge/') !== -1;
 
-    if (isMsIe) {
-      this.quill.root.addEventListener('dragover', e => {
-        e.preventDefault();
-      });
+      if (isMsIe) {
+        this.quill.root.addEventListener('dragover', e => {
+          e.preventDefault();
+        });
+      }
     }
   }
 
