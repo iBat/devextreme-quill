@@ -78,6 +78,12 @@ const tsRules = {
   ],
 };
 
+const sourceMapRules = {
+  test: /\.js$/,
+  enforce: 'pre',
+  use: ['source-map-loader'],
+};
+
 const baseConfig = {
   mode: 'development',
   context: path.resolve(__dirname, '..'),
@@ -107,7 +113,7 @@ const baseConfig = {
     extensions: ['.js', '.styl', '.ts'],
   },
   module: {
-    rules: [jsRules, stylRules, tsRules],
+    rules: [jsRules, stylRules, tsRules, sourceMapRules],
     noParse: [
       /\/node_modules\/clone\/clone\.js$/,
       /\/node_modules\/eventemitter3\/index\.js$/,
