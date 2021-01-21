@@ -46,12 +46,6 @@ Default: `warn`
 
 Shortcut for [debug](api.md). Note `debug` is a static method and will affect other instances of Quill editors on the page. Only warning and error messages are enabled by default.
 
-#### formats
-
-Default: All formats
-
-Whitelist of formats to allow in the editor. See [Formats](formats.md) for a complete list.
-
 #### modules
 
 Collection of modules to include and respective options. See [Modules](modules.md) for more information.
