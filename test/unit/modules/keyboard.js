@@ -158,4 +158,32 @@ describe('Keyboard', function() {
       ).toBe(true);
     });
   });
+  describe('onKeydown', function() {
+    ['a', 'delete', 'backspace'].forEach(key => {
+      it(`handle ${key} keydown event`, function() {
+        const quillMock = {
+          root: document.createElement('div'),
+        };
+        let counter = 0;
+        // eslint-disable-next-line no-new
+        new Keyboard(quillMock, {
+          onKeydown: () => {
+            counter += 1;
+          },
+          bindings: {},
+        });
+        const keydownEvent = new Event('keydown', {
+          key,
+          shiftKey: false,
+          metaKey: false,
+          ctrlKey: false,
+          altKey: false,
+        });
+
+        quillMock.root.dispatchEvent(keydownEvent);
+
+        expect(counter).toBe(1);
+      });
+    });
+  });
 });

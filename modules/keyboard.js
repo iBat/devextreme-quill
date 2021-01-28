@@ -185,6 +185,7 @@ class Keyboard extends Module {
   listen() {
     this.quill.root.addEventListener('keydown', evt => {
       if (evt.defaultPrevented || evt.isComposing) return;
+      this.raiseOnKeydownCallback(evt);
       const keyName = Keyboard.normalizeKeyName(evt);
       const bindings = (this.bindings[keyName] || []).concat(
         this.bindings[evt.which] || [],
@@ -261,6 +262,14 @@ class Keyboard extends Module {
     });
   }
 
+  raiseOnKeydownCallback(event) {
+    const callback = this.options.onKeydown;
+
+    if (callback && typeof callback === 'function') {
+      callback(event);
+    }
+  }
+
   handleBackspace(range, context) {
     // Check for astral symbols
     const length = /[\uD800-\uDBFF][\uDC00-\uDFFF]$/.test(context.prefix)
@@ -318,7 +327,7 @@ class Keyboard extends Module {
     this.quill.focus();
   }
 
-  handleDeleteRange(range) {
+  handleDeleteRange(range, context) {
     const lines = this.quill.getLines(range);
     let formats = {};
     if (lines.length > 1) {
@@ -328,6 +337,7 @@ class Keyboard extends Module {
     }
     this.quill.deleteText(range, Quill.sources.USER);
     if (Object.keys(formats).length > 0) {
+      this.raiseOnKeydownCallback(context.event);
       this.quill.formatLine(range.index, 1, formats, Quill.sources.USER);
     }
     this.quill.setSelection(range.index, Quill.sources.SILENT);
@@ -359,6 +369,7 @@ class Keyboard extends Module {
       if (lineFormats[name] != null) return;
       if (Array.isArray(context.format[name])) return;
       if (name === 'code' || name === 'link') return;
+      this.raiseOnKeydownCallback(context.event);
       this.quill.format(name, context.format[name], Quill.sources.USER);
     });
   }
@@ -593,6 +604,7 @@ Keyboard.DEFAULTS = {
           .delete(length + 1)
           .retain(line.length() - 2 - offset)
           .retain(1, { list: value });
+        this.raiseOnKeydownCallback(context.event);
         this.quill.updateContents(delta, Quill.sources.USER);
         this.quill.history.cutoff();
         this.quill.setSelection(range.index - length, Quill.sources.SILENT);
