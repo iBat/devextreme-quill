@@ -445,5 +445,15 @@ describe('Clipboard', function() {
       });
       expect(delta).toEqual(expected);
     });
+
+    it('handle empty text correctly', function() {
+      this.clipboard.addMatcher(Node.TEXT_NODE, (node, delta) => delta);
+
+      const delta = this.clipboard.convert({
+        html: null,
+      });
+
+      expect(delta).toEqual(new Delta());
+    });
   });
 });

@@ -94,6 +94,10 @@ class Clipboard extends Module {
   }
 
   applyTextMatchers(text = '') {
+    if (text.length === 0) {
+      return new Delta();
+    }
+
     const matchers = this.prepareTextMatching();
     const doc = new DOMParser().parseFromString(text, 'text/html');
     const node = doc.body.childNodes[0];
