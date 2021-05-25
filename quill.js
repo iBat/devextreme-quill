@@ -33,6 +33,7 @@ import CodeBlock, { Code as InlineCode } from './formats/code';
 
 import Syntax from './modules/syntax';
 import Table from './modules/table';
+import Multiline from './modules/multiline';
 
 Quill.register(
   {
@@ -85,6 +86,7 @@ Quill.register(
 
     'modules/syntax': Syntax,
     'modules/table': Table,
+    'modules/multiline': Multiline,
   },
   true,
 );
