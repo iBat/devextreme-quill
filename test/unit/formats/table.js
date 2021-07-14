@@ -76,7 +76,7 @@ describe('Table', function() {
       Editor,
       '<table><tr><td data-row="a">Test</td></tr></table>',
     );
-    editor.formatLine(0, 5, { table: null });
+    editor.formatLine(0, 5, { table: null, tableHeaderCell: null });
     expect(this.container).toEqualHTML('<p>Test</p>');
   });
 

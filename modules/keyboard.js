@@ -499,14 +499,14 @@ Keyboard.DEFAULTS = {
     },
     'table backspace': {
       key: 'backspace',
-      format: ['table'],
+      format: ['table', 'tableHeaderCell'],
       collapsed: true,
       offset: 0,
       handler() {},
     },
     'table delete': {
       key: 'del',
-      format: ['table'],
+      format: ['table', 'tableHeaderCell'],
       collapsed: true,
       suffix: /^$/,
       handler() {},
@@ -518,23 +518,45 @@ Keyboard.DEFAULTS = {
       handler(range) {
         const module = this.quill.getModule('table');
         if (module) {
+          const { quill } = this;
           const [table, row, cell, offset] = module.getTable(range);
-          const shift = tableSide(table, row, cell, offset);
-          if (shift == null) return;
-          let index = table.offset();
-          if (shift < 0) {
-            const delta = new Delta().retain(index).insert('\n');
-            this.quill.updateContents(delta, Quill.sources.USER);
-            this.quill.setSelection(
-              range.index + 1,
-              range.length,
-              Quill.sources.SILENT,
-            );
-          } else if (shift > 0) {
-            index += table.length();
-            const delta = new Delta().retain(index).insert('\n');
-            this.quill.updateContents(delta, Quill.sources.USER);
-            this.quill.setSelection(index, Quill.sources.USER);
+          const shift = tableSide(row, cell, offset);
+
+          if (shift == null) {
+            return;
+          }
+
+          const index = table.offset();
+          const hasHead = table.children.length > 1 && table.children.head;
+          if (shift < 0 && !hasHead) {
+            insertParagraphAbove({ quill, index, range });
+          } else {
+            insertParagraphBelow({ quill, index, table });
+          }
+        }
+      },
+    },
+    'table header enter': {
+      key: 'enter',
+      shiftKey: null,
+      format: ['tableHeaderCell'],
+      handler(range) {
+        const module = this.quill.getModule('table');
+        if (module) {
+          const { quill } = this;
+          const [table, row, cell, offset] = module.getTable(range);
+          const shift = tableSide(row, cell, offset);
+
+          if (shift == null) {
+            return;
+          }
+
+          const index = table.offset();
+          const hasBody = table.children.length > 1 && table.children.tail;
+          if (shift < 0 || (shift > 0 && hasBody)) {
+            insertParagraphAbove({ quill, index, range });
+          } else {
+            insertParagraphBelow({ quill, index, table });
           }
         }
       },
@@ -542,7 +564,7 @@ Keyboard.DEFAULTS = {
     'table tab': {
       key: 'tab',
       shiftKey: null,
-      format: ['table'],
+      format: ['table', 'tableHeaderCell'],
       handler(range, context) {
         const { event, line: cell } = context;
         const offset = cell.offset(this.quill.scroll);
@@ -728,14 +750,17 @@ function makeTableArrowHandler(up) {
   return {
     key: up ? 'upArrow' : 'downArrow',
     collapsed: true,
-    format: ['table'],
+    format: ['table', 'tableHeaderCell'],
     handler(range, context) {
       // TODO move to table module
       const key = up ? 'prev' : 'next';
       const cell = context.line;
       const targetRow = cell.parent[key];
       if (targetRow != null) {
-        if (targetRow.statics.blotName === 'table-row') {
+        if (
+          targetRow.statics.blotName === 'tableRow' ||
+          targetRow.statics.blotName === 'tableHeaderRow'
+        ) {
           let targetCell = targetRow.children.head;
           let cur = cell;
           while (cur.prev != null) {
@@ -800,7 +825,7 @@ function deleteRange({ quill, range }) {
   quill.setSelection(range.index, Quill.sources.SILENT);
 }
 
-function tableSide(table, row, cell, offset) {
+function tableSide(row, cell, offset) {
   if (row.prev == null && row.next == null) {
     if (cell.prev == null && cell.next == null) {
       return offset === 0 ? -1 : 1;
@@ -814,6 +839,20 @@ function tableSide(table, row, cell, offset) {
     return 1;
   }
   return null;
+}
+
+function insertParagraphAbove({ quill, index, range }) {
+  const insertIndex = index - 1;
+  const delta = new Delta().retain(insertIndex).insert('\n');
+  quill.updateContents(delta, Quill.sources.USER);
+  quill.setSelection(range.index + 1, range.length, Quill.sources.SILENT);
+}
+
+function insertParagraphBelow({ quill, index, table }) {
+  const insertIndex = index + table.length();
+  const delta = new Delta().retain(insertIndex).insert('\n');
+  quill.updateContents(delta, Quill.sources.USER);
+  quill.setSelection(insertIndex, Quill.sources.USER);
 }
 
 export { Keyboard as default, SHORTKEY, normalize, deleteRange };
