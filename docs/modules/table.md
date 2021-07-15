@@ -29,6 +29,22 @@ quill.setSelection(5);
 quill.table.insertTable(2, 2);
 ```
 
+#### insertHeaderRow
+
+Adds a header row to the `thead` element.
+
+**Methods**
+
+```js
+insertHeaderRow()
+```
+
+**Examples**
+
+```js
+quill.table.insertHeaderRow();
+```
+
 #### insertRow
 
 Adds a row above or below the cursor's position. The position of the row depends on the `offset` parameter value.
