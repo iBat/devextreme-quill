@@ -39,6 +39,7 @@ import CodeBlock, { Code as InlineCode } from './formats/code';
 import Syntax from './modules/syntax';
 import Table from './modules/table';
 import Multiline from './modules/multiline';
+import TableLite from './modules/table/lite';
 
 Quill.register(
   {
@@ -94,9 +95,12 @@ Quill.register(
     'formats/image': Image,
     'formats/video': Video,
 
+    'tableModules/lite': TableLite,
+    'tableModules/main': Table,
+
     'modules/syntax': Syntax,
-    'modules/table': Table,
     'modules/multiline': Multiline,
+    'modules/table': TableLite,
   },
   true,
 );

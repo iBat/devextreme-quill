@@ -5,7 +5,7 @@ import { EmbedBlot, Scope, TextBlot } from 'parchment';
 import Quill from '../core/quill';
 import logger from '../core/logger';
 import Module from '../core/module';
-import hasWindow from '../utils/hasWindow';
+import hasWindow from '../utils/has_window';
 
 const debug = logger('quill:keyboard');
 
@@ -109,53 +109,61 @@ class Keyboard extends Module {
         this.addBinding(this.options.bindings[name]);
       }
     });
-    this.addBinding({ key: 'enter', shiftKey: null }, this.handleEnter);
-    this.addBinding(
-      { key: 'enter', metaKey: null, ctrlKey: null, altKey: null },
-      () => {},
-    );
-    if (hasWindow() && /Firefox/i.test(navigator.userAgent)) {
-      // Need to handle delete and backspace for Firefox in the general case #1171
+
+    this.addInternalBindings();
+
+    this.listen();
+  }
+
+  addInternalBindings() {
+    this.quill.once(Quill.events.CONTENT_SETTED, () => {
+      this.addBinding({ key: 'enter', shiftKey: null }, this.handleEnter);
       this.addBinding(
-        { key: 'backspace' },
-        { collapsed: true },
-        this.handleBackspace,
+        { key: 'enter', metaKey: null, ctrlKey: null, altKey: null },
+        () => {},
       );
-      this.addBinding({ key: 'del' }, { collapsed: true }, this.handleDelete);
-    } else {
+      if (hasWindow() && /Firefox/i.test(navigator.userAgent)) {
+        // Need to handle delete and backspace for Firefox in the general case #1171
+        this.addBinding(
+          { key: 'backspace' },
+          { collapsed: true },
+          this.handleBackspace,
+        );
+        this.addBinding({ key: 'del' }, { collapsed: true }, this.handleDelete);
+      } else {
+        this.addBinding(
+          { key: 'backspace' },
+          { collapsed: true, prefix: /^.?$/ },
+          this.handleBackspace,
+        );
+        this.addBinding(
+          { key: 'del' },
+          { collapsed: true, suffix: /^.?$/ },
+          this.handleDelete,
+        );
+      }
       this.addBinding(
         { key: 'backspace' },
-        { collapsed: true, prefix: /^.?$/ },
-        this.handleBackspace,
+        { collapsed: false },
+        this.handleDeleteRange,
       );
       this.addBinding(
         { key: 'del' },
-        { collapsed: true, suffix: /^.?$/ },
-        this.handleDelete,
+        { collapsed: false },
+        this.handleDeleteRange,
       );
-    }
-    this.addBinding(
-      { key: 'backspace' },
-      { collapsed: false },
-      this.handleDeleteRange,
-    );
-    this.addBinding(
-      { key: 'del' },
-      { collapsed: false },
-      this.handleDeleteRange,
-    );
-    this.addBinding(
-      {
-        key: 'backspace',
-        altKey: null,
-        ctrlKey: null,
-        metaKey: null,
-        shiftKey: null,
-      },
-      { collapsed: true, offset: 0 },
-      this.handleBackspace,
-    );
-    this.listen();
+      this.addBinding(
+        {
+          key: 'backspace',
+          altKey: null,
+          ctrlKey: null,
+          metaKey: null,
+          shiftKey: null,
+        },
+        { collapsed: true, offset: 0 },
+        this.handleBackspace,
+      );
+    });
   }
 
   addBinding(keyBinding, context = {}, handler = {}) {
@@ -498,84 +506,6 @@ Keyboard.DEFAULTS = {
         this.quill.scrollIntoView();
       },
     },
-    'table backspace': {
-      key: 'backspace',
-      format: ['table', 'tableHeaderCell'],
-      collapsed: true,
-      offset: 0,
-      handler() {},
-    },
-    'table delete': {
-      key: 'del',
-      format: ['table', 'tableHeaderCell'],
-      collapsed: true,
-      suffix: /^$/,
-      handler() {},
-    },
-    'table enter': {
-      key: 'enter',
-      shiftKey: null,
-      format: ['table'],
-      handler(range) {
-        const module = this.quill.getModule('table');
-        if (module) {
-          const { quill } = this;
-          const [table, row, cell, offset] = module.getTable(range);
-          const shift = tableSide(row, cell, offset);
-
-          if (shift == null) {
-            return;
-          }
-
-          const index = table.offset();
-          const hasHead = table.children.length > 1 && table.children.head;
-          if (shift < 0 && !hasHead) {
-            insertParagraphAbove({ quill, index, range });
-          } else {
-            insertParagraphBelow({ quill, index, table });
-          }
-        }
-      },
-    },
-    'table header enter': {
-      key: 'enter',
-      shiftKey: null,
-      format: ['tableHeaderCell'],
-      handler(range) {
-        const module = this.quill.getModule('table');
-        if (module) {
-          const { quill } = this;
-          const [table, row, cell, offset] = module.getTable(range);
-          const shift = tableSide(row, cell, offset);
-
-          if (shift == null) {
-            return;
-          }
-
-          const index = table.offset();
-          const hasBody = table.children.length > 1 && table.children.tail;
-          if (shift < 0 || (shift > 0 && hasBody)) {
-            insertParagraphAbove({ quill, index, range });
-          } else {
-            insertParagraphBelow({ quill, index, table });
-          }
-        }
-      },
-    },
-    'table tab': {
-      key: 'tab',
-      shiftKey: null,
-      format: ['table', 'tableHeaderCell'],
-      handler(range, context) {
-        const { event, line: cell } = context;
-        const offset = cell.offset(this.quill.scroll);
-        if (event.shiftKey) {
-          this.quill.setSelection(offset - 1, Quill.sources.USER);
-        } else {
-          this.quill.setSelection(offset + cell.length(), Quill.sources.USER);
-        }
-      },
-    },
     'list autofill': {
       key: 'space',
       shiftKey: null,
@@ -656,8 +586,6 @@ Keyboard.DEFAULTS = {
     'embed left shift': makeEmbedArrowHandler('leftArrow', true),
     'embed right': makeEmbedArrowHandler('rightArrow', false),
     'embed right shift': makeEmbedArrowHandler('rightArrow', true),
-    'table down': makeTableArrowHandler(false),
-    'table up': makeTableArrowHandler(true),
   },
 };
 
@@ -747,55 +675,6 @@ function makeFormatHandler(format) {
   };
 }
 
-function makeTableArrowHandler(up) {
-  return {
-    key: up ? 'upArrow' : 'downArrow',
-    collapsed: true,
-    format: ['table', 'tableHeaderCell'],
-    handler(range, context) {
-      // TODO move to table module
-      const key = up ? 'prev' : 'next';
-      const cell = context.line;
-      const targetRow = cell.parent[key];
-      if (targetRow != null) {
-        if (
-          targetRow.statics.blotName === 'tableRow' ||
-          targetRow.statics.blotName === 'tableHeaderRow'
-        ) {
-          let targetCell = targetRow.children.head;
-          let cur = cell;
-          while (cur.prev != null) {
-            cur = cur.prev;
-            targetCell = targetCell.next;
-          }
-          const index =
-            targetCell.offset(this.quill.scroll) +
-            Math.min(context.offset, targetCell.length() - 1);
-          this.quill.setSelection(index, 0, Quill.sources.USER);
-        }
-      } else {
-        const targetLine = cell.table()[key];
-        if (targetLine != null) {
-          if (up) {
-            this.quill.setSelection(
-              targetLine.offset(this.quill.scroll) + targetLine.length() - 1,
-              0,
-              Quill.sources.USER,
-            );
-          } else {
-            this.quill.setSelection(
-              targetLine.offset(this.quill.scroll),
-              0,
-              Quill.sources.USER,
-            );
-          }
-        }
-      }
-      return false;
-    },
-  };
-}
-
 function normalize(binding) {
   if (typeof binding === 'string' || typeof binding === 'number') {
     binding = { key: binding };
@@ -824,36 +703,6 @@ function deleteRange({ quill, range }) {
     quill.formatLine(range.index, 1, formats, Quill.sources.USER);
   }
   quill.setSelection(range.index, Quill.sources.SILENT);
-}
-
-function tableSide(row, cell, offset) {
-  if (row.prev == null && row.next == null) {
-    if (cell.prev == null && cell.next == null) {
-      return offset === 0 ? -1 : 1;
-    }
-    return cell.prev == null ? -1 : 1;
-  }
-  if (row.prev == null) {
-    return -1;
-  }
-  if (row.next == null) {
-    return 1;
-  }
-  return null;
-}
-
-function insertParagraphAbove({ quill, index, range }) {
-  const insertIndex = index - 1;
-  const delta = new Delta().retain(insertIndex).insert('\n');
-  quill.updateContents(delta, Quill.sources.USER);
-  quill.setSelection(range.index + 1, range.length, Quill.sources.SILENT);
-}
-
-function insertParagraphBelow({ quill, index, table }) {
-  const insertIndex = index + table.length();
-  const delta = new Delta().retain(insertIndex).insert('\n');
-  quill.updateContents(delta, Quill.sources.USER);
-  quill.setSelection(insertIndex, Quill.sources.USER);
 }
 
 export { Keyboard as default, SHORTKEY, normalize, deleteRange };
