@@ -36,6 +36,8 @@ class TableLite extends Module {
   constructor(...args) {
     super(...args);
 
+    this.tableBlots = [TableCell.blotName, TableHeaderCell.blotName];
+
     this.integrateClipboard();
     this.addKeyboardHandlers();
 
@@ -43,8 +45,9 @@ class TableLite extends Module {
   }
 
   integrateClipboard() {
-    this.quill.clipboard.addTableBlot(TableCell.blotName);
-    this.quill.clipboard.addTableBlot(TableHeaderCell.blotName);
+    this.tableBlots.forEach(blotName =>
+      this.quill.clipboard.addTableBlot(blotName),
+    );
 
     this.quill.clipboard.addMatcher('tr', matchTable);
     this.quill.clipboard.addMatcher(ELEMENT_NODE, matchDimensions);
@@ -103,10 +106,9 @@ class TableLite extends Module {
     }
 
     const [cell, offset] = this.quill.getLine(range.index);
-    const allowedBlots = [TableCell.blotName, TableHeaderCell.blotName];
     if (
       !isDefined(cell) ||
-      allowedBlots.indexOf(cell.statics.blotName) === -1
+      this.tableBlots.indexOf(cell.statics.blotName) === -1
     ) {
       return EMPTY_RESULT;
     }
@@ -198,6 +200,10 @@ class TableLite extends Module {
     this.quill.updateContents(delta, Quill.sources.USER);
     this.quill.setSelection(range.index, Quill.sources.SILENT);
     this.balanceTables();
+  }
+
+  tableFormats() {
+    return this.tableBlots;
   }
 
   listenBalanceCells() {

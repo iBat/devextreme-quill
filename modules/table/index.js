@@ -38,6 +38,8 @@ class Table extends Module {
   constructor(...args) {
     super(...args);
 
+    this.tableBlots = [CellLine.blotName, HeaderCellLine.blotName];
+
     this.integrateClipboard();
     this.addKeyboardHandlers();
 
@@ -45,8 +47,10 @@ class Table extends Module {
   }
 
   integrateClipboard() {
-    this.quill.clipboard.addTableBlot(CellLine.blotName);
-    this.quill.clipboard.addTableBlot(TableHeaderCell.blotName);
+    this.tableBlots.forEach(blotName =>
+      this.quill.clipboard.addTableBlot(blotName),
+    );
+
     this.quill.clipboard.addMatcher('td, th', matchCell);
     this.quill.clipboard.addMatcher(ELEMENT_NODE, matchDimensions);
   }
@@ -104,10 +108,9 @@ class Table extends Module {
     }
 
     const [cellLine, offset] = this.quill.getLine(range.index);
-    const allowedBlots = [CellLine.blotName, HeaderCellLine.blotName];
     if (
       !isDefined(cellLine) ||
-      allowedBlots.indexOf(cellLine.statics.blotName) === -1
+      this.tableBlots.indexOf(cellLine.statics.blotName) === -1
     ) {
       return EMPTY_RESULT;
     }
@@ -205,6 +208,10 @@ class Table extends Module {
     this.quill.updateContents(delta, Quill.sources.USER);
     this.quill.setSelection(range.index, Quill.sources.SILENT);
     this.balanceTables();
+  }
+
+  tableFormats() {
+    return this.tableBlots;
   }
 
   listenBalanceCells() {
