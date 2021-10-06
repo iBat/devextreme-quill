@@ -13,13 +13,14 @@ import {
   TableHeaderRow,
   TableHeader,
   HeaderCellLine,
-  TABLE_TAGS,
 } from '../../formats/table';
 import isDefined from '../../utils/is_defined';
 import { deltaEndsWith, applyFormat } from '../clipboard';
 import makeTableArrowHandler from './utils/make_table_arrow_handler';
+import prepareAttributeMatcher from './utils/prepare_attr_matcher';
+import { TABLE_FORMATS } from '../../formats/table/attributors/table';
+import { CELL_FORMATS } from '../../formats/table/attributors/cell';
 
-const ELEMENT_NODE = 1;
 const EMPTY_RESULT = [null, null, null, -1];
 
 class Table extends Module {
@@ -33,6 +34,12 @@ class Table extends Module {
     Quill.register(TableBody, true);
     Quill.register(TableHeader, true);
     Quill.register(TableContainer, true);
+
+    [TABLE_FORMATS, CELL_FORMATS].forEach(formats => {
+      Object.keys(formats).forEach(name => {
+        Quill.register({ [`formats/${name}`]: formats[name] }, true);
+      });
+    });
   }
 
   constructor(...args) {
@@ -40,6 +47,9 @@ class Table extends Module {
 
     this.tableBlots = [CellLine.blotName, HeaderCellLine.blotName];
 
+    this.tableBlots.forEach(blotName => {
+      this.quill.editor.addImmediateFormat(blotName);
+    });
     this.integrateClipboard();
     this.addKeyboardHandlers();
 
@@ -47,12 +57,13 @@ class Table extends Module {
   }
 
   integrateClipboard() {
-    this.tableBlots.forEach(blotName =>
-      this.quill.clipboard.addTableBlot(blotName),
-    );
+    this.tableBlots.forEach(blotName => {
+      this.quill.clipboard.addTableBlot(blotName);
+    });
 
     this.quill.clipboard.addMatcher('td, th', matchCell);
-    this.quill.clipboard.addMatcher(ELEMENT_NODE, matchDimensions);
+    this.quill.clipboard.addMatcher('table', prepareAttributeMatcher('table'));
+    this.quill.clipboard.addMatcher('td, th', prepareAttributeMatcher('cell'));
   }
 
   addKeyboardHandlers() {
@@ -353,25 +364,6 @@ function matchCell(node, delta) {
   }
 
   return applyFormat(delta, cellLineBlotName, { row: rowId, cell: cellId });
-}
-
-function matchDimensions(node, delta) {
-  const isTableNode = TABLE_TAGS.indexOf(node.tagName) !== -1;
-  return delta.reduce((newDelta, op) => {
-    const isEmbed = typeof op.insert === 'object';
-    const attributes = op.attributes || {};
-    const { width, height, ...rest } = attributes;
-    const formats =
-      attributes.tableCellLine ||
-      attributes.tableHeaderCellLine ||
-      attributes.tableCell ||
-      attributes.tableHeaderCell ||
-      isTableNode ||
-      isEmbed
-        ? attributes
-        : { ...rest };
-    return newDelta.insert(op.insert, formats);
-  }, new Delta());
 }
 
 export default Table;

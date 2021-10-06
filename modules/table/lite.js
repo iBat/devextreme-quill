@@ -10,7 +10,6 @@ import {
   TableHeaderCell,
   TableHeaderRow,
   TableHeader,
-  TABLE_TAGS,
 } from '../../formats/table/lite';
 import { applyFormat } from '../clipboard';
 import isDefined from '../../utils/is_defined';
@@ -18,8 +17,10 @@ import makeTableArrowHandler from './utils/make_table_arrow_handler';
 import insertParagraphAbove from './utils/insert_pr_below';
 import insertParagraphBelow from './utils/insert_pr_above';
 import tableSide from './utils/table_side';
+import prepareAttributeMatcher from './utils/prepare_attr_matcher';
+import { TABLE_FORMATS } from '../../formats/table/attributors/table';
+import { CELL_FORMATS } from '../../formats/table/attributors/cell';
 
-const ELEMENT_NODE = 1;
 const EMPTY_RESULT = [null, null, null, -1];
 
 class TableLite extends Module {
@@ -31,6 +32,12 @@ class TableLite extends Module {
     Quill.register(TableBody, true);
     Quill.register(TableHeader, true);
     Quill.register(TableContainer, true);
+
+    [TABLE_FORMATS, CELL_FORMATS].forEach(formats => {
+      Object.keys(formats).forEach(name => {
+        Quill.register({ [`formats/${name}`]: formats[name] }, true);
+      });
+    });
   }
 
   constructor(...args) {
@@ -38,6 +45,9 @@ class TableLite extends Module {
 
     this.tableBlots = [TableCell.blotName, TableHeaderCell.blotName];
 
+    this.tableBlots.forEach(blotName => {
+      this.quill.editor.addImmediateFormat(blotName);
+    });
     this.integrateClipboard();
     this.addKeyboardHandlers();
 
@@ -50,7 +60,8 @@ class TableLite extends Module {
     );
 
     this.quill.clipboard.addMatcher('tr', matchTable);
-    this.quill.clipboard.addMatcher(ELEMENT_NODE, matchDimensions);
+    this.quill.clipboard.addMatcher('table', prepareAttributeMatcher('table'));
+    this.quill.clipboard.addMatcher('td, th', prepareAttributeMatcher('cell'));
   }
 
   addKeyboardHandlers() {
@@ -324,20 +335,6 @@ function matchTable(node, delta) {
   const rows = Array.from(table.querySelectorAll('tr'));
   const row = rows.indexOf(node) + 1;
   return applyFormat(delta, isHeaderRow ? 'tableHeaderCell' : 'table', row);
-}
-
-function matchDimensions(node, delta) {
-  const isTableNode = TABLE_TAGS.indexOf(node.tagName) !== -1;
-  return delta.reduce((newDelta, op) => {
-    const isEmbed = typeof op.insert === 'object';
-    const attributes = op.attributes || {};
-    const { width, height, ...rest } = attributes;
-    const formats =
-      attributes.table || attributes.tableHeaderCell || isTableNode || isEmbed
-        ? attributes
-        : { ...rest };
-    return newDelta.insert(op.insert, formats);
-  }, new Delta());
 }
 
 export default TableLite;

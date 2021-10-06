@@ -18,8 +18,9 @@ import CodeBlock from '../formats/code';
 import { ColorStyle } from '../formats/color';
 import { DirectionAttribute, DirectionStyle } from '../formats/direction';
 import { FontStyle } from '../formats/font';
-import { SizeStyle, WidthAttribute, HeightAttribute } from '../formats/size';
+import { SizeStyle } from '../formats/size';
 import { deleteRange } from './keyboard';
+import capitalize from '../utils/capitalize';
 
 const debug = logger('quill:clipboard');
 
@@ -44,15 +45,13 @@ const CLIPBOARD_CONFIG = [
 ];
 
 const HTML_TEXT_MATCHERS = [matchText, matchNewline];
-const ATTRIBUTE_ATTRIBUTORS = [
-  AlignAttribute,
-  DirectionAttribute,
-  WidthAttribute,
-  HeightAttribute,
-].reduce((memo, attr) => {
-  memo[attr.keyName] = attr;
-  return memo;
-}, {});
+const ATTRIBUTE_ATTRIBUTORS = [AlignAttribute, DirectionAttribute].reduce(
+  (memo, attr) => {
+    memo[attr.keyName] = attr;
+    return memo;
+  },
+  {},
+);
 
 const STYLE_ATTRIBUTORS = [
   AlignStyle,
@@ -401,31 +400,33 @@ function matchAlias(format, node, delta) {
 }
 
 function matchAttributor(node, delta, scroll) {
-  const attributes = Attributor.keys(node);
-  const classes = ClassAttributor.keys(node);
-  const styles = StyleAttributor.keys(node);
-  const formats = {};
-  attributes
-    .concat(classes)
-    .concat(styles)
-    .forEach(name => {
-      let attr = scroll.query(name, Scope.ATTRIBUTE);
-      if (attr != null) {
-        formats[attr.attrName] = attr.value(node);
-        if (formats[attr.attrName]) return;
-      }
-      attr = ATTRIBUTE_ATTRIBUTORS[name];
-      if (attr != null && (attr.attrName === name || attr.keyName === name)) {
-        formats[attr.attrName] = attr.value(node) || undefined;
-      }
-      attr = STYLE_ATTRIBUTORS[name];
-      if (attr != null && (attr.attrName === name || attr.keyName === name)) {
+  if (['TD', 'TH', 'TABLE'].indexOf(node.tagName) === -1) {
+    const attributes = Attributor.keys(node);
+    const classes = ClassAttributor.keys(node);
+    const styles = StyleAttributor.keys(node);
+    const formats = {};
+    attributes
+      .concat(classes)
+      .concat(styles)
+      .forEach(name => {
+        let attr = scroll.query(name, Scope.ATTRIBUTE);
+        if (attr != null) {
+          formats[attr.attrName] = attr.value(node);
+          if (formats[attr.attrName]) return;
+        }
+        attr = ATTRIBUTE_ATTRIBUTORS[name];
+        if (attr != null && (attr.attrName === name || attr.keyName === name)) {
+          formats[attr.attrName] = attr.value(node) || undefined;
+        }
         attr = STYLE_ATTRIBUTORS[name];
-        formats[attr.attrName] = attr.value(node) || undefined;
-      }
-    });
-  if (Object.keys(formats).length > 0) {
-    return applyFormat(delta, formats);
+        if (attr != null && (attr.attrName === name || attr.keyName === name)) {
+          attr = STYLE_ATTRIBUTORS[name];
+          formats[attr.attrName] = attr.value(node) || undefined;
+        }
+      });
+    if (Object.keys(formats).length > 0) {
+      return applyFormat(delta, formats);
+    }
   }
   return delta;
 }
@@ -527,7 +528,8 @@ function matchStyles(node, delta) {
 
   ['height', 'width'].forEach(dimension => {
     if (['TD', 'TH'].indexOf(node.tagName) !== -1 && style[dimension]) {
-      formats[dimension] = style[dimension];
+      const name = `cell${capitalize(dimension)}`;
+      formats[name] = style[dimension];
     }
   });
   if (style.fontStyle === 'italic') {

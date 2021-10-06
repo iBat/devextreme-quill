@@ -16,12 +16,7 @@ import List from './formats/list';
 import { BackgroundClass, BackgroundStyle } from './formats/background';
 import { ColorClass, ColorStyle } from './formats/color';
 import { FontClass, FontStyle } from './formats/font';
-import {
-  SizeClass,
-  SizeStyle,
-  WidthAttribute,
-  HeightAttribute,
-} from './formats/size';
+import { SizeClass, SizeStyle } from './formats/size';
 
 import Bold from './formats/bold';
 import Italic from './formats/italic';
@@ -40,12 +35,44 @@ import Syntax from './modules/syntax';
 import Table from './modules/table';
 import Multiline from './modules/multiline';
 import TableLite from './modules/table/lite';
+import {
+  CellBackgroundColorStyle,
+  CellBorderColorStyle,
+  CellBorderStyle,
+  CellBorderStyleStyle,
+  CellBorderWidthStyle,
+  CellHeightAttribute,
+  CellHeightStyle,
+  CellPaddingBottomStyle,
+  CellPaddingLeftStyle,
+  CellPaddingRightStyle,
+  CellPaddingStyle,
+  CellPaddingTopStyle,
+  CellTextAlignStyle,
+  CellVerticalAlignStyle,
+  CellWidthAttribute,
+  CellWidthStyle,
+} from './formats/table/attributors/cell';
+import {
+  TableAlignStyle,
+  TableBackgroundColorStyle,
+  TableBorderColorStyle,
+  TableBorderStyle,
+  TableBorderStyleStyle,
+  TableBorderWidthStyle,
+  TableHeightAttribute,
+  TableHeightStyle,
+  TableWidthAttribute,
+  TableWidthStyle,
+} from './formats/table/attributors/table';
 
 Quill.register(
   {
     'attributors/attribute/direction': DirectionAttribute,
-    'attributors/attribute/width': WidthAttribute,
-    'attributors/attribute/height': HeightAttribute,
+    'attributors/attribute/tableWidth': TableWidthAttribute,
+    'attributors/attribute/tableHeight': TableHeightAttribute,
+    'attributors/attribute/cellWidth': CellWidthAttribute,
+    'attributors/attribute/cellHeight': CellHeightAttribute,
 
     'attributors/class/align': AlignClass,
     'attributors/class/background': BackgroundClass,
@@ -60,6 +87,28 @@ Quill.register(
     'attributors/style/direction': DirectionStyle,
     'attributors/style/font': FontStyle,
     'attributors/style/size': SizeStyle,
+    'attributors/style/tableAlign': TableAlignStyle,
+    'attributors/style/tableBackgroundColor': TableBackgroundColorStyle,
+    'attributors/style/tableBorder': TableBorderStyle,
+    'attributors/style/tableBorderStyle': TableBorderStyleStyle,
+    'attributors/style/tableBorderColor': TableBorderColorStyle,
+    'attributors/style/tableBorderWidth': TableBorderWidthStyle,
+    'attributors/style/tableWidth': TableWidthStyle,
+    'attributors/style/tableHeight': TableHeightStyle,
+    'attributors/style/cellBackground': CellBackgroundColorStyle,
+    'attributors/style/cellBorder': CellBorderStyle,
+    'attributors/style/cellBorderStyle': CellBorderStyleStyle,
+    'attributors/style/cellBorderWidth': CellBorderWidthStyle,
+    'attributors/style/cellBorderColor': CellBorderColorStyle,
+    'attributors/style/cellPadding': CellPaddingStyle,
+    'attributors/style/cellPaddingTop': CellPaddingTopStyle,
+    'attributors/style/cellPaddingBottom': CellPaddingBottomStyle,
+    'attributors/style/cellPaddingLeft': CellPaddingLeftStyle,
+    'attributors/style/cellPaddingRight': CellPaddingRightStyle,
+    'attributors/style/cellVerticalAlign': CellVerticalAlignStyle,
+    'attributors/style/cellTextAlign': CellTextAlignStyle,
+    'attributors/style/cellWidth': CellWidthStyle,
+    'attributors/style/cellHeight': CellHeightStyle,
   },
   true,
 );
@@ -69,9 +118,6 @@ Quill.register(
     'formats/align': AlignClass,
     'formats/direction': DirectionClass,
     'formats/indent': Indent,
-
-    'formats/width': WidthAttribute,
-    'formats/height': HeightAttribute,
 
     'formats/background': BackgroundStyle,
     'formats/color': ColorStyle,
@@ -100,7 +146,7 @@ Quill.register(
 
     'modules/syntax': Syntax,
     'modules/multiline': Multiline,
-    'modules/table': TableLite,
+    'modules/table': Table,
   },
   true,
 );
