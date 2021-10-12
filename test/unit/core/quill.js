@@ -3,6 +3,7 @@ import Quill, { expandConfig, overload } from '../../../core/quill';
 import Theme from '../../../core/theme';
 import Emitter from '../../../core/emitter';
 import { Range } from '../../../core/selection';
+import TableMain from '../../../modules/table';
 
 describe('Quill', function() {
   it('imports', function() {
@@ -828,6 +829,30 @@ describe('Quill', function() {
         '<br><br><h1>Hi!</h1><p>Te<br>st</p>',
       );
       const expected = '<p><br></p><p><br></p><h1>Hi!</h1><p>Te</p><p>st</p>';
+
+      expect(instance.getSemanticHTML()).toEqual(expected);
+    });
+
+    it('should skip table data attributes', function() {
+      Quill.register({ 'modules/table': TableMain }, true);
+      const instance = this.initialize(
+        Quill,
+        `<p>123</p>
+        <table>
+          <tr><td>1</td><td>2</td></tr>
+        </table>`,
+        this.container,
+        {
+          modules: {
+            table: true,
+          },
+        },
+      );
+      const expected = `<p>123</p><table style="border-style: dashed; border-width: 2px;"><tbody><tr><td class="ql-table-data-cell"><p class="ql-table-cell-line">1</p></td><td class="ql-table-data-cell"><p class="ql-table-cell-line">2</p></td></tr></tbody></table>`;
+
+      instance.setSelection(5, 0);
+      instance.format('tableBorderStyle', 'dashed');
+      instance.format('tableBorderWidth', '2px');
 
       expect(instance.getSemanticHTML()).toEqual(expected);
     });
