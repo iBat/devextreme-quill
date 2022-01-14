@@ -189,4 +189,72 @@ describe('Keyboard', function() {
       });
     });
   });
+
+  describe('bindings', function() {
+    it('which modifier', function() {
+      const quillMock = {
+        root: document.createElement('div'),
+        once: (eventName, handler) => {
+          handler();
+        },
+        hasFocus: () => true,
+        getSelection: () => {
+          return { index: 0, length: 0 };
+        },
+        getFormat: () => {
+          return {};
+        },
+        getLine: () => {
+          return [{ length: () => 0 }, 0];
+        },
+        getLeaf: () => {
+          return [0, 0];
+        },
+      };
+      const fakeEvent = {
+        key: 'b',
+        which: 66,
+        code: 'KeyB',
+        shiftKey: false,
+        metaKey: false,
+        ctrlKey: true,
+        altKey: false,
+      };
+      let counter = 0;
+
+      const nativeAddEventListener = quillMock.root.addEventListener;
+
+      quillMock.root.addEventListener = function(type, handler) {
+        const modifiedHandler = () => {
+          handler(fakeEvent);
+        };
+
+        nativeAddEventListener.call(this, type, modifiedHandler);
+      };
+
+      // eslint-disable-next-line no-new
+      new Keyboard(quillMock, {
+        bindings: {
+          66: {
+            key: 'b',
+            which: 66,
+            ctrlKey: true,
+            handler() {
+              counter += 1;
+            },
+          },
+        },
+      });
+
+      const keydownEvent = new KeyboardEvent('keydown', {
+        key: 'n',
+      });
+
+      quillMock.root.dispatchEvent(keydownEvent);
+
+      expect(counter).toBe(1);
+
+      quillMock.root.addEventListener = nativeAddEventListener;
+    });
+  });
 });

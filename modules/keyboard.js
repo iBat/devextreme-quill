@@ -178,7 +178,12 @@ class Keyboard extends Module {
     if (typeof handler === 'function') {
       handler = { handler };
     }
-    const keys = Array.isArray(binding.key) ? binding.key : [binding.key];
+
+    const keyPropery = binding.which ? 'which' : 'key';
+    const keys = Array.isArray(binding[keyPropery])
+      ? binding[keyPropery]
+      : [binding[keyPropery]];
+
     keys.forEach(key => {
       const singleBinding = {
         ...binding,
@@ -225,7 +230,10 @@ class Keyboard extends Module {
         suffix: suffixText,
         event: evt,
       };
-      const prevented = matches.some(binding => {
+
+      let prevented = false;
+
+      matches.some(binding => {
         if (
           binding.collapsed != null &&
           binding.collapsed !== curContext.collapsed
@@ -263,8 +271,20 @@ class Keyboard extends Module {
         if (binding.suffix != null && !binding.suffix.test(curContext.suffix)) {
           return false;
         }
-        return binding.handler.call(this, range, curContext, binding) !== true;
+
+        const handlerResult = binding.handler.call(
+          this,
+          range,
+          curContext,
+          binding,
+        );
+        const preventAfterAllMatches = handlerResult?.preventAfterAllMatches;
+
+        prevented = handlerResult !== true || preventAfterAllMatches;
+
+        return prevented && !preventAfterAllMatches;
       });
+
       if (prevented) {
         evt.preventDefault();
       }
@@ -375,9 +395,9 @@ class Keyboard extends Module {
 
 Keyboard.DEFAULTS = {
   bindings: {
-    bold: makeFormatHandler('bold'),
-    italic: makeFormatHandler('italic'),
-    underline: makeFormatHandler('underline'),
+    bold: makeFormatHandler('bold', 66),
+    italic: makeFormatHandler('italic', 73),
+    underline: makeFormatHandler('underline', 85),
     indent: {
       // highlight tab or tab at beginning of list, indent or blockquote
       key: 'tab',
@@ -665,12 +685,14 @@ function makeEmbedArrowHandler(key, shiftKey) {
   };
 }
 
-function makeFormatHandler(format) {
+function makeFormatHandler(format, which) {
   return {
     key: format[0],
+    which,
     shortKey: true,
     handler(range, context) {
       this.quill.format(format, !context.format[format], Quill.sources.USER);
+      return { preventAfterAllMatches: true };
     },
   };
 }
