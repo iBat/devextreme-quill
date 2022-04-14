@@ -108,5 +108,52 @@ describe('Uploader', function() {
 
       expect(dropEvent.defaultPrevented).toBeTrue();
     });
+
+    [
+      {
+        preventValue: true,
+      },
+      {
+        preventValue: false,
+      },
+      {
+        preventValue: false,
+        forceUpload: true,
+      },
+    ].forEach(data => {
+      it(`check preventImageUploading ${data.preventValue}`, function() {
+        const testRange = new Range(0);
+        const file = {
+          name: 'test.png',
+          type: 'image/png',
+        };
+        const expectedUploadsCount =
+          data.preventValue && !data.forceUpload ? 0 : 1;
+        let uploads = [];
+
+        const quillMock = {
+          root: {
+            addEventListener: () => {},
+          },
+        };
+
+        const uploaderInstance = new Uploader(quillMock, {
+          mimetypes: Uploader.DEFAULTS.mimetypes,
+          handler: (range, files) => {
+            uploads = files;
+          },
+        });
+
+        uploaderInstance.preventImageUploading(!data.preventValue);
+        uploaderInstance.preventImageUploading(data.preventValue);
+
+        uploaderInstance.upload(testRange, [file], data.forceUpload);
+
+        expect(uploaderInstance.preventImageUploading()).toEqual(
+          data.preventValue,
+        );
+        expect(uploads.length).toEqual(expectedUploadsCount);
+      });
+    });
   });
 });

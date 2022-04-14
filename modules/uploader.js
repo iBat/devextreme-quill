@@ -7,6 +7,7 @@ class Uploader extends Module {
   constructor(quill, options) {
     super(quill, options);
 
+    this.preventImageUploading(false);
     this.addDragOverHandler();
     this.addDropHandler();
   }
@@ -36,7 +37,7 @@ class Uploader extends Module {
         onDrop(e);
       }
 
-      if (noFiles) {
+      if (noFiles || this.preventImageUpload) {
         return;
       }
 
@@ -59,7 +60,18 @@ class Uploader extends Module {
     });
   }
 
-  upload(range, files) {
+  preventImageUploading(value) {
+    if (typeof value !== 'undefined') {
+      this.preventImageUpload = value;
+    }
+    return this.preventImageUpload;
+  }
+
+  upload(range, files, force) {
+    if (this.preventImageUpload && !force) {
+      return;
+    }
+
     const uploads = [];
     Array.from(files).forEach(file => {
       if (file && this.options.mimetypes.indexOf(file.type) !== -1) {
