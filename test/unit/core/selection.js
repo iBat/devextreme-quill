@@ -4,8 +4,8 @@ import Emitter from '../../../core/emitter';
 
 describe('Selection', function () {
   beforeEach(function () {
-    this.setup = (html, index) => {
-      this.selection = this.initialize(Selection, html);
+    this.setup = (html, index, container) => {
+      this.selection = this.initialize(Selection, html, container);
       this.selection.setRange(new Range(index));
     };
   });
@@ -621,6 +621,46 @@ describe('Selection', function () {
       expect(() => {
         this.bounds = selection.getBounds(0, 10);
       }).not.toThrow();
+    });
+  });
+
+  describe('ShadowDom', function () {
+    beforeEach(function () {
+      this.containerForShadow = document.body.appendChild(document.createElement('div'));
+      this.containerForShadow.attachShadow({ mode: 'open' });
+
+      this.containerForShadow.shadowRoot.innerHTML = '<div></div>';
+
+      this.componentContainer = this.containerForShadow.shadowRoot.querySelector('div');
+    });
+
+    afterEach(function () {
+      this.containerForShadow.remove();
+    });
+
+    it('getNativeRange should return actual result for selected content', function () {
+      this.setup('<p id="text_wrapper">0123</p>', 0, this.componentContainer);
+      const { shadowRoot } = this.containerForShadow;
+      const textWrapper = shadowRoot.getElementById('text_wrapper');
+      const range = new window.Range();
+      range.setStart(textWrapper, 0);
+      range.setEnd(textWrapper, 1);
+      shadowRoot.getSelection().removeAllRanges();
+      shadowRoot.getSelection().addRange(range);
+
+      const nativeSelection = this.selection.getNativeRange();
+
+      expect(nativeSelection.start.offset).toEqual(0);
+      expect(nativeSelection.end.offset).toEqual(4);
+    });
+
+    it('hasFocus should return actual state', function () {
+      this.setup('<p>0123</p>', 2, this.componentContainer);
+      const textWrapper = this.containerForShadow.shadowRoot.querySelector('p');
+
+      textWrapper.focus();
+
+      expect(this.selection.hasFocus()).toEqual(true);
     });
   });
 });
