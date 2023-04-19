@@ -1166,6 +1166,237 @@ describe('Table Module', function () {
         true,
       );
     });
+
+    describe('deleteAt', function () {
+      it('should not remove a cell (T1062588)', function () {
+        this.quill.setSelection(0);
+        this.table.deleteRow();
+
+        this.quill.scroll.deleteAt(5, 3);
+        expect(this.quill.root).toEqualHTML(
+          `
+            <table>
+              <tbody>
+                <tr>
+                  <td><p>b1</p></td>
+                  <td><p>b2</p></td>
+                  <td><p><br></p></td>
+                </tr>
+              </tbody>
+            </table>
+          `,
+          true,
+        );
+      });
+
+      it('should remove a cell line', function () {
+        const markup = `
+          <table>
+            <tbody>
+              <tr>
+                <td>a1<br>a2</td>
+              </tr>
+            </tbody>
+          </table>
+        `;
+        this.quill = this.initialize(Quill, markup, this.container, {
+          modules: {
+            table: true,
+          },
+        });
+
+        this.quill.scroll.deleteAt(2, 3);
+        expect(this.quill.root).toEqualHTML(
+          `
+            <table>
+              <tbody>
+                <tr>
+                  <td><p>a1</p></td>
+                </tr>
+              </tbody>
+            </table>
+          `,
+          true,
+        );
+      });
+
+      it('should not remove a cell if several cells are selected', function () {
+        this.quill.setSelection(0);
+        this.table.deleteRow();
+
+        this.quill.scroll.deleteAt(1, 7);
+        expect(this.quill.root).toEqualHTML(
+          `
+            <table>
+              <tbody>
+                <tr>
+                  <td><p>b</p></td>
+                  <td><p><br></p></td>
+                  <td><p><br></p></td>
+                </tr>
+              </tbody>
+            </table>
+          `,
+          true,
+        );
+      });
+
+      it('should not remove a header cell if several cells are selected', function () {
+        const markup = `
+          <table>
+            <thead>
+              <tr>
+                <th><p>h1</p></th>
+                <th><p>h2</p></th>
+                <th><p>h3</p></th>
+              </tr>
+            </thead>
+          </table>
+        `;
+        this.quill = this.initialize(Quill, markup, this.container, {
+          modules: {
+            table: true,
+          },
+        });
+
+        this.quill.scroll.deleteAt(3, 7);
+        expect(this.quill.root).toEqualHTML(
+          `
+            <table>
+              <thead>
+                <tr>
+                  <th><p>h1</p></th>
+                  <th><p><br></p></th>
+                  <th><p><br></p></th>
+                </tr>
+              </thead>
+            </table>
+          `,
+          true,
+        );
+      });
+
+      it('should not remove a row', function () {
+        this.quill.scroll.deleteAt(5, 12);
+        expect(this.quill.root).toEqualHTML(
+          `
+            <table>
+              <tbody>
+                <tr>
+                  <td><p>a1</p></td>
+                  <td><p>a2</p></td>
+                  <td><p><br></p></td>
+                </tr>
+                <tr>
+                  <td><p><br></p></td>
+                  <td><p><br></p></td>
+                  <td><p><br></p></td>
+                </tr>
+              </tbody>
+            </table>
+          `,
+          true,
+        );
+      });
+
+      it('should not move cells content if selection ends after table', function () {
+        const markup = `
+          <table>
+            <tbody>
+              <tr>
+                <td><p>h1</p></td>
+              </tr>
+            </tbody>
+          </table>
+          <br>
+        `;
+        this.quill = this.initialize(Quill, markup, this.container, {
+          modules: {
+            table: true,
+          },
+        });
+        this.quill.scroll.deleteAt(2, 1);
+        expect(this.quill.root).toEqualHTML(
+          `
+          <table>
+            <tbody>
+              <tr>
+                <td><p>h1</p></td>
+              </tr>
+            </tbody>
+          </table>
+          <p><br></p>
+          `,
+          true,
+        );
+      });
+
+      it('should not move header cells content if selection ends after table', function () {
+        const markup = `
+          <table>
+            <thead>
+              <tr>
+                <th><p>h1</p></th>
+              </tr>
+            </thead>
+          </table>
+          <p><br></p>
+        `;
+        this.quill = this.initialize(Quill, markup, this.container, {
+          modules: {
+            table: true,
+          },
+        });
+        this.quill.scroll.deleteAt(2, 1);
+        expect(this.quill.root).toEqualHTML(
+          `
+          <table>
+            <thead>
+              <tr>
+                <th><p>h1</p></th>
+              </tr>
+            </thead>
+          </table>
+          <p><br></p>
+          `,
+          true,
+        );
+      });
+
+      it('should remove a table', function () {
+        this.quill.scroll.deleteAt(0, 18);
+        expect(this.quill.root).toEqualHTML(
+          `
+          <p><br></p>
+          `,
+          true,
+        );
+      });
+    });
+
+    it('type should not remove a cell if it is selected', function () {
+      this.quill.updateContents(new Delta().retain(14).delete(5).insert('_INPUT_'), 'user');
+
+      expect(this.quill.root).toEqualHTML(
+        `
+          <table>
+            <tbody>
+              <tr>
+                <td><p>a1</p></td>
+                <td><p>a2</p></td>
+                <td><p>a3</p></td>
+              </tr>
+              <tr>
+                <td><p>b1</p></td>
+                <td><p>b2_INPUT_</p></td>
+                <td><p><br></p></td>
+              </tr>
+            </tbody>
+          </table>
+        `,
+        true,
+      );
+    });
   });
 
   describe('customize table', function () {

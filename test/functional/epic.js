@@ -13,6 +13,10 @@ const P1 = 'Call me Ishmael. Some years ago—never mind how long precisely-havi
 const P2 = 'There now is your insular city of the Manhattoes, belted round by wharves as Indian isles by coral reefs—commerce surrounds it with her surf. Right and left, the streets take you waterward. Its extreme downtown is the battery, where that noble mole is washed by waves, and cooled by breezes, which a few hours previous were out of sight of land. Look at the crowds of water-gazers there.';
 const HOST = 'http://127.0.0.1:8080';
 
+function sanitizeTableHtml(html) {
+  return html.replace(/(<\w+)((\s+class\s*=\s*"[^"]*")|(\s+data-[\w-]+\s*=\s*"[^"]*"))*(\s*>)/gi, '$1$5');
+}
+
 describe('quill', function () {
   it('compose an epic', async function () {
     const browser = await puppeteer.launch({
@@ -246,6 +250,210 @@ describe('quill', function () {
     expect(updatedWindowScrollY).toBeLessThan(actualWindowScrollY);
 
     await browser.close();
+  });
+});
+
+describe('table header: ', function () {
+  it('cell should not be removed on typing if it is selected', async function () {
+    const browser = await puppeteer.launch({
+      headless: false,
+    });
+    const page = await browser.newPage();
+
+    await page.goto(`${HOST}/table_header.html`);
+    await page.waitForSelector('.ql-editor', { timeout: 10000 });
+
+    await page.click('[data-table-cell="3"]');
+
+    await page.keyboard.down('Shift');
+    await page.keyboard.press('ArrowLeft');
+    await page.keyboard.press('ArrowLeft');
+    await page.keyboard.up('Shift');
+
+    await page.keyboard.press('c');
+
+    const html = await page.$eval('.ql-editor', (e) => e.innerHTML);
+    const sanitizeHtml = sanitizeTableHtml(html);
+    expect(sanitizeHtml).toEqual(
+      `
+        <table>
+        <thead>
+          <tr>
+            <th><p>1</p></th>
+            <th><p>2c</p></th>
+            <th><p><br></p></th>
+          </tr>
+        </thead>
+        </table>
+        <p><br></p>
+      `.replace(/\s/g, ''),
+    );
+  });
+});
+
+describe('table:', function () {
+  it('cell should not be removed on typing if it is selected', async function () {
+    const browser = await puppeteer.launch({
+      headless: false,
+    });
+    const page = await browser.newPage();
+
+    await page.goto(`${HOST}/table.html`);
+    await page.waitForSelector('.ql-editor', { timeout: 10000 });
+
+    await page.click('[data-table-cell="3"]');
+
+    await page.keyboard.down('Shift');
+    await page.keyboard.press('ArrowLeft');
+    await page.keyboard.press('ArrowLeft');
+    await page.keyboard.up('Shift');
+
+    await page.keyboard.press('c');
+
+    const html = await page.$eval('.ql-editor', (e) => e.innerHTML);
+    const sanitizeHtml = sanitizeTableHtml(html);
+    expect(sanitizeHtml).toEqual(
+      `
+        <table>
+        <tbody>
+          <tr>
+            <td><p>1</p></td>
+            <td><p>2c</p></td>
+            <td><p><br></p></td>
+          </tr>
+        </tbody>
+        </table>
+        <p><br></p>
+      `.replace(/\s/g, ''),
+    );
+  });
+
+  it('backspace press on the position after table should remove an empty line and not add it to the cell', async function () {
+    const browser = await puppeteer.launch({
+      headless: false,
+    });
+    const page = await browser.newPage();
+
+    await page.goto(`${HOST}/table.html`);
+    await page.waitForSelector('.ql-editor', { timeout: 10000 });
+
+    await page.click('[data-table-cell="3"]');
+    await page.keyboard.press('ArrowRight');
+    await page.keyboard.press('Backspace');
+
+    const html = await page.$eval('.ql-editor', (e) => e.innerHTML);
+    const sanitizeHtml = sanitizeTableHtml(html);
+    expect(sanitizeHtml).toEqual(
+      `
+        <table>
+        <tbody>
+          <tr>
+            <td><p>1</p></td>
+            <td><p>2</p></td>
+            <td><p>3</p></td>
+          </tr>
+        </tbody>
+        </table>
+      `.replace(/\s/g, ''),
+    );
+  });
+
+  it('backspace in multiline cell should work as usual', async function () {
+    const browser = await puppeteer.launch({
+      headless: false,
+    });
+    const page = await browser.newPage();
+
+    await page.goto(`${HOST}/table.html`);
+    await page.waitForSelector('.ql-editor', { timeout: 10000 });
+
+    await page.click('[data-table-cell="3"]');
+    await page.keyboard.press('4');
+    await page.keyboard.press('Enter');
+    await page.keyboard.press('Backspace');
+    await page.keyboard.press('Backspace');
+
+    const html = await page.$eval('.ql-editor', (e) => e.innerHTML);
+    const sanitizeHtml = sanitizeTableHtml(html);
+    expect(sanitizeHtml).toEqual(
+      `
+        <table>
+        <tbody>
+          <tr>
+            <td><p>1</p></td>
+            <td><p>2</p></td>
+            <td><p>3</p></td>
+          </tr>
+        </tbody>
+        </table>
+        <p><br></p>
+      `.replace(/\s/g, ''),
+    );
+  });
+
+  it('backspace press on the position after table should only move a caret to cell if next line is not empty', async function () {
+    const browser = await puppeteer.launch({
+      headless: false,
+    });
+    const page = await browser.newPage();
+
+    await page.goto(`${HOST}/table.html`);
+    await page.waitForSelector('.ql-editor', { timeout: 10000 });
+
+    await page.click('[data-table-cell="3"]');
+    await page.keyboard.press('ArrowRight');
+    await page.keyboard.press('g');
+    await page.keyboard.press('ArrowLeft');
+    await page.keyboard.press('Backspace');
+    await page.keyboard.press('w');
+
+    const html = await page.$eval('.ql-editor', (e) => e.innerHTML);
+    const sanitizeHtml = sanitizeTableHtml(html);
+    expect(sanitizeHtml).toEqual(
+      `
+        <table>
+        <tbody>
+          <tr>
+            <td><p>1</p></td>
+            <td><p>2</p></td>
+            <td><p>3w</p></td>
+          </tr>
+        </tbody>
+        </table>
+        <p>g</p>
+      `.replace(/\s/g, ''),
+    );
+  });
+
+  it('backspace press on the position after table should remove empty line and move caret to a cell if next line is empty', async function () {
+    const browser = await puppeteer.launch({
+      headless: false,
+    });
+    const page = await browser.newPage();
+
+    await page.goto(`${HOST}/table.html`);
+    await page.waitForSelector('.ql-editor', { timeout: 10000 });
+
+    await page.click('[data-table-cell="3"]');
+    await page.keyboard.press('ArrowRight');
+    await page.keyboard.press('Backspace');
+    await page.keyboard.press('w');
+
+    const html = await page.$eval('.ql-editor', (e) => e.innerHTML);
+    const sanitizeHtml = sanitizeTableHtml(html);
+    expect(sanitizeHtml).toEqual(
+      `
+        <table>
+        <tbody>
+          <tr>
+            <td><p>1</p></td>
+            <td><p>2</p></td>
+            <td><p>3w</p></td>
+          </tr>
+        </tbody>
+        </table>
+      `.replace(/\s/g, ''),
+    );
   });
 });
 

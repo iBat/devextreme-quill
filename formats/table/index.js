@@ -11,12 +11,18 @@ const CELL_IDENTITY_KEYS = ['row', 'cell'];
 const TABLE_TAGS = ['TD', 'TH', 'TR', 'TBODY', 'THEAD', 'TABLE'];
 const DATA_PREFIX = 'data-table-';
 
+function deleteChildrenAt(children, index, length) {
+  children.forEachAt(index, length, (child, offset, childLength) => {
+    child.deleteAt(offset, childLength);
+  });
+}
+
 class CellLine extends Block {
   static create(value) {
     const node = super.create(value);
     CELL_IDENTITY_KEYS.forEach((key) => {
       const identityMarker = key === 'row' ? tableId : cellId;
-      node.setAttribute(`${DATA_PREFIX}${key}`, value[key] ?? identityMarker());
+      node.setAttribute(`${DATA_PREFIX}${key}`, value?.[key] ?? identityMarker());
     });
 
     return node;
@@ -183,6 +189,10 @@ class BaseCell extends Container {
     }
     super.optimize(...args);
   }
+
+  deleteAt(index, length) {
+    deleteChildrenAt(this.children, index, length);
+  }
 }
 BaseCell.tagName = ['TD', 'TH'];
 
@@ -210,6 +220,7 @@ class TableCell extends BaseCell {
 TableCell.blotName = 'tableCell';
 TableCell.className = 'ql-table-data-cell';
 TableCell.dataAttribute = `${DATA_PREFIX}row`;
+TableCell.defaultChild = CellLine;
 
 class TableHeaderCell extends BaseCell {
   static create(value) {
@@ -236,6 +247,7 @@ TableHeaderCell.tagName = ['TH', 'TD'];
 TableHeaderCell.className = 'ql-table-header-cell';
 TableHeaderCell.blotName = 'tableHeaderCell';
 TableHeaderCell.dataAttribute = `${DATA_PREFIX}header-row`;
+TableHeaderCell.defaultChild = HeaderCellLine;
 
 class BaseRow extends Container {
   checkMerge() {
@@ -315,6 +327,10 @@ class TableRow extends BaseRow {
     super(scroll, domNode);
 
     this.childFormatName = 'table';
+  }
+
+  deleteAt(index, length) {
+    deleteChildrenAt(this.children, index, length);
   }
 }
 TableRow.blotName = 'tableRow';
