@@ -350,16 +350,22 @@ class RowContainer extends Container {
       this.statics.requiredContainer
       && !(this.parent instanceof this.statics.requiredContainer)
     ) {
-      const { domNode } = this.children.head.children.head.children.head;
+      const domNode = this.children.head.children.head.children?.head?.domNode || null;
       const formats = {};
-      Object.keys(TABLE_FORMATS).forEach((format) => {
-        const value = domNode.dataset[format.toLowerCase()];
-        if (value) {
-          formats[format] = value;
-        }
-      });
+
+      if (domNode) {
+        Object.keys(TABLE_FORMATS).forEach((format) => {
+          const value = domNode.dataset[format.toLowerCase()];
+
+          if (value) {
+            formats[format] = value;
+          }
+        });
+      }
+
       this.wrap(this.statics.requiredContainer.blotName, formats);
     }
+
     super.optimize(...args);
   }
 }
@@ -530,7 +536,7 @@ class TableContainer extends Container {
     const formats = {};
     const childElem = this.cells()[0].domNode.firstElementChild;
     Object.keys(TABLE_FORMATS).forEach((format) => {
-      const value = childElem.dataset[format.toLowerCase()];
+      const value = childElem?.dataset[format.toLowerCase()];
       if (value) {
         formats[format] = value;
       }

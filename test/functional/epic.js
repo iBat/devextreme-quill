@@ -490,6 +490,34 @@ if (!isMac) {
   });
 }
 
+describe('Mutation content with table', function () {
+  it('Should be no errors when table is inserted to editor (T1180959)', async function () {
+    const browser = await puppeteer.launch({
+      headless: false,
+    });
+    const page = await browser.newPage();
+
+    await page.goto(`${HOST}/table_drag_drop.html`);
+    await page.waitForSelector('.ql-editor', { timeout: 10000 });
+
+    page.on('pageerror', () => {
+      expect(true).toEqual(false);
+    });
+
+    await page.evaluate(() => {
+      const editor = document.querySelector('.ql-editor');
+
+      const table = document.createElement('table');
+
+      table.innerHTML = '<tbody><tr><td><p><br/></p></td><td><p>Custom text</p></td></tr></tbody>';
+
+      editor.appendChild(table);
+    });
+
+    expect(true).toEqual(true);
+  });
+});
+
 function getSelectionInTextNode() {
   const {
     anchorNode, anchorOffset, focusNode, focusOffset,
