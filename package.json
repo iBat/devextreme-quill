@@ -34,8 +34,7 @@
     "lodash.isequal": "^4.5.0",
     "lodash.merge": "^4.6.2",
     "parchment": "^2.0.1",
-    "quill-delta": "^5.0.0",
-    "webpack-dev-server": "^4.15.1"
+    "quill-delta": "^5.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.2",
@@ -63,19 +62,22 @@
     "karma-sauce-launcher": "^4.1.4",
     "lodash": "^4.17.21",
     "mini-css-extract-plugin": "^2.6.1",
+    "minimist": "^1.2.8",
+    "nconf": "^0.12.1",
     "ncp": "^2.0.0",
-    "puppeteer": "^19.2.2",
     "rimraf": "^3.0.2",
     "source-map-loader": "^4.0.1",
     "style-loader": "^3.3.1",
     "stylus": "^0.59.0",
     "stylus-loader": "^7.1.0",
     "terser-webpack-plugin": "^5.3.6",
+    "testcafe": "^3.4.0",
     "ts-loader": "^9.4.1",
     "typescript": "^4.8.4",
     "wait-on": "^6.0.1",
     "webpack": "^5.74.0",
-    "webpack-cli": "^4.10.0"
+    "webpack-cli": "^4.10.0",
+    "webpack-dev-server": "^4.15.1"
   },
   "license": "BSD-3-Clause",
   "repository": {
@@ -100,8 +102,7 @@
     "dev:test:unit": "npm run build && npm run test:unit",
     "dev:test:functional": "concurrently -k npm:start:dev npm:test:functional",
     "preci:test:functional": "npm run copy-dist",
-    "ci:test:functional": "http-server ./test/functional/example > .http-log & HTTP_PID=$! && npm run test:functional && kill $HTTP_PID && cat .http-log",
-    "test:functional": "wait-on http://127.0.0.1:8080/index.html -i 1000 -t 10000 && jasmine test/functional/epic.js",
+    "test:functional": "node ./test/functional/runner",
     "test:unit": "karma start _develop/karma.config.js",
     "test:coverage": "webpack --env coverage --config _develop/webpack.config.js && karma start _develop/karma.config.js --reporters coverage",
     "version": "npm version --no-git-tag-version"
