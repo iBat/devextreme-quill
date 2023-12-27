@@ -73,6 +73,7 @@ class Clipboard extends Module {
     this.quill.root.addEventListener('paste', this.onCapturePaste.bind(this));
     this.matchers = [];
     this.tableBlots = options.tableBlots ?? [];
+    this.multilineParagraph = false;
     CLIPBOARD_CONFIG.concat(this.options.matchers).forEach(
       ([selector, matcher]) => {
         this.addMatcher(selector, matcher);
@@ -129,6 +130,7 @@ class Clipboard extends Module {
       elementMatchers,
       textMatchers,
       nodeMatches,
+      this.multilineParagraph,
     );
     // Remove trailing newline
     if (
@@ -382,7 +384,7 @@ function isPre(node) {
   return preNodes.get(node);
 }
 
-function traverse(scroll, node, elementMatchers, textMatchers, nodeMatches) {
+function traverse(scroll, node, elementMatchers, textMatchers, nodeMatches, multilineParagraph) {
   // Post-order
   if (node.nodeType === node.TEXT_NODE) {
     return textMatchers.reduce((delta, matcher) => {
@@ -390,15 +392,22 @@ function traverse(scroll, node, elementMatchers, textMatchers, nodeMatches) {
     }, new Delta());
   }
   if (node.nodeType === node.ELEMENT_NODE) {
-    return Array.from(node.childNodes || []).reduce((delta, childNode) => {
+    return Array.from(node.childNodes || []).reduce((delta, childNode, idx, allNodes) => {
       let childrenDelta = traverse(
         scroll,
         childNode,
         elementMatchers,
         textMatchers,
         nodeMatches,
+        multilineParagraph,
       );
+      const nextNode = idx < allNodes.length - 1 && allNodes[idx + 1];
+      const isNextNodeList = nextNode
+        && nextNode.nodeType === node.ELEMENT_NODE
+        && ['ul', 'ol'].indexOf(nextNode.tagName.toLowerCase()) > -1;
+
       if (childNode.nodeType === node.ELEMENT_NODE) {
+        multilineParagraph = childNode.tagName.toLowerCase() === 'br';
         childrenDelta = elementMatchers.reduce((reducedDelta, matcher) => {
           return matcher(childNode, reducedDelta, scroll);
         }, childrenDelta);
@@ -409,7 +418,14 @@ function traverse(scroll, node, elementMatchers, textMatchers, nodeMatches) {
           childrenDelta,
         );
       }
-      return delta.concat(childrenDelta);
+
+      const newDelta = delta.concat(childrenDelta);
+
+      if (multilineParagraph && isNextNodeList) {
+        newDelta.insert('\n');
+      }
+
+      return newDelta;
     }, new Delta());
   }
   return new Delta();

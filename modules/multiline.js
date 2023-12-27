@@ -4,7 +4,7 @@ import MultilineBreak from '../blots/multiline_break';
 import Module from '../core/module';
 
 function breakMatcher(node) {
-  if (!node.nextSibling && !node.previousSibling) {
+  if (!(node.nextSibling || node.previousSibling)) {
     return new Delta().insert('\n');
   }
   return new Delta().insert({ multilineBreak: '' });
