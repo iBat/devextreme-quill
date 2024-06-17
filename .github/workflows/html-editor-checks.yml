@@ -26,7 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Quill repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Build package
         uses: ./.github/actions/quill/steps/build-package
@@ -42,7 +42,7 @@ jobs:
         branch: ${{ fromJson(needs.set-up-branches.outputs.branches) }}
     steps:
       - name: Checkout Quill repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: quill-repo
 
@@ -64,7 +64,7 @@ jobs:
         test-suite: [ui.htmlEditor]
     steps:
       - name: Checkout Quill repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: quill-repo
 
@@ -89,14 +89,25 @@ jobs:
         ]
     steps:
       - name: Checkout Quill repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: quill-repo
 
       - name: Testcafe tests
+        if: matrix.branch != '24_1'
         uses: ./quill-repo/.github/actions/html-editor/steps/testcafe-tests
         with:
           branch: ${{ matrix.branch }}
-          devextreme-package-directory: ${{ (matrix.branch == '23_2' || matrix.branch == '24_1') && 'devextreme-repo/packages/devextreme' || 'devextreme-repo' }}
+          devextreme-package-directory: ${{ matrix.branch == '23_2' && 'devextreme-repo/packages/devextreme' || 'devextreme-repo' }}
           component-directory: ${{ matrix.test-suite.componentFolder }}
           quarantine-mode: ${{ matrix.test-suite.quarantineMode }}
+
+      - name: Testcafe tests (separate project)
+        if: matrix.branch == '24_1'
+        uses: ./quill-repo/.github/actions/html-editor/steps/testcafe-tests
+        with:
+          branch: ${{ matrix.branch }}
+          devextreme-package-directory: devextreme-repo/e2e/testcafe-devextreme
+          component-directory: ${{ matrix.test-suite.componentFolder }}
+          quarantine-mode: ${{ matrix.test-suite.quarantineMode }}
+          script-name: test
