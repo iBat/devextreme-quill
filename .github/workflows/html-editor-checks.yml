@@ -99,6 +99,8 @@ jobs:
         with:
           branch: ${{ matrix.branch }}
           devextreme-package-directory: ${{ matrix.branch == '23_2' && 'devextreme-repo/packages/devextreme' || 'devextreme-repo' }}
+          e2e-package-directory: ${{ matrix.branch == '23_2' && 'devextreme-repo/packages/devextreme' || 'devextreme-repo' }}
+          test-artifacts-directory: ${{ matrix.branch == '23_2' && 'devextreme-repo/packages/devextreme/testing/testcafe/artifacts' || 'devextreme-repo/testing/testcafe/artifacts' }}
           component-directory: ${{ matrix.test-suite.componentFolder }}
           quarantine-mode: ${{ matrix.test-suite.quarantineMode }}
 
@@ -107,7 +109,9 @@ jobs:
         uses: ./quill-repo/.github/actions/html-editor/steps/testcafe-tests
         with:
           branch: ${{ matrix.branch }}
-          devextreme-package-directory: devextreme-repo/e2e/testcafe-devextreme
+          devextreme-package-directory: devextreme-repo/packages/devextreme
+          e2e-package-directory: devextreme-repo/e2e/testcafe-devextreme
+          test-artifacts-directory: devextreme-repo/e2e/testcafe-devextreme/artifacts
           component-directory: ${{ matrix.test-suite.componentFolder }}
           quarantine-mode: ${{ matrix.test-suite.quarantineMode }}
           script-name: test
